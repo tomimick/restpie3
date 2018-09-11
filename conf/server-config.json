@@ -1,0 +1,14 @@
+{
+    "name": "python server config template - rename me",
+
+    "PYSRV_IS_PRODUCTION": "",
+
+    "PYSRV_DATABASE_HOST": "localhost",
+    "PYSRV_DATABASE_NAME": "tmdb",
+    "PYSRV_DATABASE_USER": "tm",
+    "PYSRV_DATABASE_PASSWORD": "",
+
+    "PYSRV_REDIS_HOST": "localhost",
+    "PYSRV_DOMAIN_NAME": "mydomain.com"
+}
+
