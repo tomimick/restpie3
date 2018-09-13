@@ -1,0 +1,27 @@
+
+# systemd service configuration - uwsgi daemon
+#
+# https://www.digitalocean.com/community/tutorials/understanding-systemd-units-and-unit-files
+# https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uwsgi-and-nginx-on-ubuntu-16-04
+
+# make start on boot: systemctl enable mydaemon
+
+[Unit]
+Description=pysrv uwsgi daemon
+After=network.target
+
+[Service]
+User=root
+#User=myapp # user privileges are set by uwsgi
+#Group=mygroup
+# note: create /tmp/pysrv_spooler on reboot
+ExecStartPre=/bin/mkdir -p /tmp/pysrv_spooler;
+ExecStart=/usr/local/bin/uwsgi --ini /app/conf/uwsgi.ini:uwsgi-production
+RuntimeDirectory=mydaemon
+Restart=always
+RestartSec=3
+KillSignal=SIGQUIT
+
+[Install]
+WantedBy=multi-user.target
+
