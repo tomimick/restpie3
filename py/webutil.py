@@ -196,7 +196,7 @@ class MyLogContextFilter(logging.Filter):
             uid = session.get("userid", "anon")
         else:
             ip = ""
-            uid = "anon"
+            uid = "  -WORKER" # background worker
 
         record.ip = "local" if config.IS_LOCAL_DEV else ip
         record.uid = uid
