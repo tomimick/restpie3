@@ -18,7 +18,7 @@ URL_LOGIN      = 'login'
 URL_LOGOUT     = 'logout'
 URL_ME         = 'me'
 URL_USERS      = 'users'
-URL_TRUNCATE   = "dbtruncate"
+URL_TRUNCATE   = "../apitest/dbtruncate"
 
 s = requests.Session() # remember session
 

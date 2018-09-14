@@ -20,9 +20,9 @@ import logging
 log = logging.getLogger("api")
 
 
-@app.route('/api/list_api', methods = ['GET'])
+@app.route('/api/list', methods = ['GET'])
 def list_api():
-    """For testing: List the available REST APIs in this service. Queries
+    """List the available REST APIs in this service as HTML. Queries
     methods directly from Flask, no need to maintain separate API doc.
     (Maybe this could be used as a start to generate Swagger API spec too.)"""
 
@@ -58,7 +58,7 @@ def list_api():
     return header + "<br/>".join(apilist) + footer
 
 
-@app.route('/api/dbtruncate', methods = ['POST'])
+@app.route('/apitest/dbtruncate', methods = ['POST'])
 @local_dev_only
 def truncate():
     """For testing: Empty all data from all tables. An external test script
@@ -68,7 +68,7 @@ def truncate():
     return jsonify({}), 200
 
 
-@app.route('/api/sendemail', methods = ['GET'])
+@app.route('/apitest/sendemail', methods = ['GET'])
 def send():
     """For testing: Example of activating a background task."""
 
