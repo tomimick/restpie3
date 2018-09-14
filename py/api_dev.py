@@ -6,15 +6,15 @@
 #
 # Author: Tomi.Mickelsson@iki.fi
 
+from flask import jsonify, abort, render_template
+import datetime
 import html
-from flask import request, session, jsonify, g, abort
-from webutil import app, local_dev_only
 
 import db
-import util
-import webutil
 import config
 import bgtasks
+import red
+from webutil import app, local_dev_only
 
 import logging
 log = logging.getLogger("api")
@@ -78,4 +78,12 @@ def send():
             subject="Hello world!", template="welcome.html")
 
     return jsonify({"reply":"background task will start"}), 200
+
+
+@app.route('/apitest/counter', methods = ['GET'])
+def testcounter():
+    """For testing: Increment redis counter."""
+
+    num = red.incr("testcounter")
+    return jsonify({"counter":num}), 200
 
