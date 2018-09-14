@@ -14,6 +14,7 @@ import db
 import util
 import webutil
 import config
+import bgtasks
 
 import logging
 log = logging.getLogger("api")
@@ -65,4 +66,16 @@ def truncate():
 
     cursor = db.database.execute_sql("truncate users, movies")
     return jsonify({}), 200
+
+
+@app.route('/api/sendemail', methods = ['GET'])
+def send():
+    """For testing: Example of activating a background task."""
+
+    log.info("executing a background task")
+
+    bgtasks.send_email.spool(email="tomi@tomicloud.com",
+            subject="Hello world!", template="welcome.html")
+
+    return jsonify({"reply":"background task will start"}), 200
 
