@@ -21,7 +21,7 @@ log = logging.getLogger("webutil")
 
 
 # create and configure the Flask app
-app = Flask(__name__, static_folder=None)
+app = Flask(__name__, static_folder=None, template_folder="../templates")
 app.config.update(config.flask_config)
 Session(app)
 

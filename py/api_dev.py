@@ -87,3 +87,13 @@ def testcounter():
     num = red.incr("testcounter")
     return jsonify({"counter":num}), 200
 
+
+@app.route('/examplehtml', methods = ['GET'])
+def htmlpage():
+    """For testing: Example HTML page, if you want to use templates."""
+
+    # just some data for the template
+    clock = datetime.datetime.now()
+
+    return render_template('example.html', clock=clock)
+
