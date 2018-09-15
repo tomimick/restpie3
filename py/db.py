@@ -36,7 +36,9 @@ class BaseModel(Model):
 
     def serialize(self):
         """Serialize the model into a dict."""
-        return model_to_dict(self, recurse=False, exclude=self.EXCLUDE_FIELDS)
+        d = model_to_dict(self, recurse=False, exclude=self.EXCLUDE_FIELDS)
+        d["id"] = str(d["id"]) # unification: id is always a string
+        return d
 
     class Meta:
         database = database
@@ -152,6 +154,58 @@ def query_users(page=0, limit=1000, search=None):
 
 
 # --------------------------------------------------------------------------
+# MOVIE - just an example for CRUD API...
+
+class Movie(BaseModel):
+
+    #id - automatic
+
+    title = TextField()
+    director = TextField()
+
+    created = DateTimeField()
+    modified = DateTimeField()
+
+    creator = ForeignKeyField(db_column='creator', null=True,
+                    model=User, to_field='id')
+
+    class Meta:
+        db_table = 'movies'
+
+
+def get_movie(id):
+    """Return Movie or throw."""
+    return get_object_or_404(Movie, id=id)
+
+
+def query_movies(page=None, limit=None, search='', creator=None):
+    """Return list of movies which match given filters."""
+
+    page  = page or 0
+    limit = limit or 1000
+
+    q = Movie.select()
+
+    if search:
+        search = "%"+search+"%"
+        q = q.where(Movie.title ** search | Movie.director ** search)
+
+    if creator:
+        q = q.where(Movie.creator == creator)
+
+    q = q.paginate(page, limit).order_by(Movie.id)
+    return q
+
+
+def query_unique_directors():
+    """Return list of unique directors. An example of a raw SQL query."""
+
+    sql = "SELECT DISTINCT(director) FROM movies"
+    rq = database.execute_sql(sql)
+    return [x[0] for x in rq]
+
+
+# --------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
@@ -164,4 +218,7 @@ if __name__ == '__main__':
     print(u)
 
     print(list(query_users(0, "10", ".com")))
+
+    print(list(query_movies()))
+    print(query_unique_directors())
 

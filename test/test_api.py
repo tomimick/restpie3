@@ -20,6 +20,9 @@ URL_ME         = 'me'
 URL_USERS      = 'users'
 URL_TRUNCATE   = "../apitest/dbtruncate"
 
+URL_MOVIES     = 'movies/'
+
+
 s = requests.Session() # remember session
 
 headers = {'content-type': 'application/json',
@@ -77,10 +80,57 @@ class Tests(unittest.TestCase):
     def test006_test_roles(self):
         self.call(URL_USERS, 401)
 
-    def call(self, url, httpcode=200, payload = None):
+    def test007_movies(self):
+        payload = {"email":"tomi@example.com", "password":"123abC"}
+        reply = self.call(URL_LOGIN, 200, payload)
+        my_uid = reply["id"]
+
+        self.assertEqual([], self.call(URL_MOVIES))
+
+        payload = {"title":"Forrest Gump", "director":"Robert Zemeckis"}
+        self.call(URL_MOVIES, 200, payload)
+        payload = {"title":"Matrix", "director":"Lana Wachowsk"}
+        self.call(URL_MOVIES, 200, payload)
+
+        reply = self.call(URL_MOVIES)
+        self.assertEqual(2, len(reply))
+        self.assertEqual("Forrest Gump", reply[0]["title"])
+        self.assertEqual("Lana Wachowsk", reply[1]["director"])
+        self.assertEqual(my_uid, reply[1]["creator"])
+
+        id_gump = reply[0]["id"]
+        id_matrix = reply[1]["id"]
+
+        reply = self.call(URL_MOVIES+id_matrix)
+        self.assertEqual("Matrix", reply["title"])
+
+        payload = {"director":"Lana Wachowski"}
+        reply = self.call(URL_MOVIES+id_matrix, 200, payload, s.put)
+
+        reply = self.call(URL_MOVIES+id_matrix)
+        self.assertEqual("Lana Wachowski", reply["director"])
+        self.assertEqual(2, len(self.call(URL_MOVIES)))
+
+        reply = self.call(URL_MOVIES+"?search=matrix")
+        self.assertEqual(1, len(reply))
+
+        reply = self.call(URL_MOVIES+"?search=s")
+        self.assertEqual(2, len(reply))
+
+        reply = self.call(URL_MOVIES+"?creator="+my_uid)
+        self.assertEqual(2, len(reply))
+
+        reply = self.call(URL_MOVIES+id_matrix, 200, None, s.delete)
+        self.assertEqual(1, len(self.call(URL_MOVIES)))
+        reply = self.call(URL_MOVIES+id_gump, 200, None, s.delete)
+        self.assertEqual([], self.call(URL_MOVIES))
+
+
+
+    def call(self, url, httpcode=200, payload = None, request_method=False):
         """GET or POST to server REST API"""
 
-        func = s.post if payload != None else s.get
+        func = request_method if request_method else s.post if payload != None else s.get
         r = func(URL_BASE + url, data = json.dumps(payload or {}),
                 headers = headers)
 

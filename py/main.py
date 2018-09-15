@@ -5,9 +5,10 @@
 #
 # Author: Tomi.Mickelsson@iki.fi
 
-# register REST endpoints
+# register REST API endpoints
 import api_account
 import api_dev
+import api_movies
 
 import cron
 
