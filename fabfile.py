@@ -68,7 +68,7 @@ def postgres_list_users():
 
 @task
 def postgres_gen_models():
-    """Generate peewee models from database"""
+    """Generate peewee models from database: generated-models.py"""
 
     cmd = "pwiz.py -e postgresql -u tm -P tmdb >generated-models.py"
     local(cmd)
@@ -92,7 +92,7 @@ def production():
 
 @task
 def deploy():
-    """Deploy current local sources to server"""
+    """Deploy current local sources to server + db migration"""
 
     rsync_files()
 
@@ -115,7 +115,7 @@ def rsync_files():
 
 @task
 def deploy_mydaemon():
-    """Update uwsgi master daemon config, then restart"""
+    """Update uwsgi master config conf/pydaemon.service, then restart"""
 
     sudo("systemctl stop pydaemon", warn_only=True)
 

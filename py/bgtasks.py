@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# bgtasks.py: background tasks
+# bgtasks.py: background tasks, which are run in separate worker processes
 #   - execute these just by spooling arguments to functions, like:
 #       bgtasks.send_email.spool(arg_list_here)
 #
