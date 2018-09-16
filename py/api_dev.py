@@ -14,7 +14,7 @@ import db
 import config
 import bgtasks
 import red
-from webutil import app, local_dev_only
+from webutil import app
 
 import logging
 log = logging.getLogger("api")
@@ -58,14 +58,14 @@ def list_api():
     return header + "<br/>".join(apilist) + footer
 
 
-@app.route('/apitest/dbtruncate', methods = ['POST'])
-@local_dev_only
-def truncate():
-    """For testing: Empty all data from all tables. An external test script
-    can call this at start. Only accessible in local dev machine."""
+if config.IS_LOCAL_DEV:
+    @app.route('/apitest/dbtruncate', methods = ['POST'])
+    def truncate():
+        """For testing: Empty all data from all tables. An external test script
+        can call this at start. Only accessible in local dev machine."""
 
-    cursor = db.database.execute_sql("truncate users, movies")
-    return jsonify({}), 200
+        cursor = db.database.execute_sql("truncate users, movies")
+        return jsonify({}), 200
 
 
 @app.route('/apitest/sendemail', methods = ['GET'])

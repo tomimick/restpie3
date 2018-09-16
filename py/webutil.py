@@ -44,16 +44,6 @@ def login_required(func=None, role=None):
     return inner
 
 
-def local_dev_only(func):
-    """Decorator: this test method is available only in the local
-    development machine."""
-
-    @functools.wraps(func)
-    def inner(*args, **kwargs):
-        return func(*args, **kwargs) if config.IS_LOCAL_DEV else ''
-    return inner
-
-
 def _check_user_role(role):
     """Check that my role is atleast the given role. If not, log and return
     an error."""
