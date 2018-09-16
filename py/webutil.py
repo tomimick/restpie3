@@ -206,6 +206,9 @@ def init_logging():
     for handler in logging.root.handlers:
         handler.addFilter(f)
 
+    if config.PYSRV_LOG_SQL:
+        logging.getLogger('peewee').setLevel(logging.DEBUG)
+
 
 # --------------------------------------------------------------------------
 # serializing models - REST JSON encoder

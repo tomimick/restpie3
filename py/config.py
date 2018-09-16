@@ -58,3 +58,6 @@ flask_config = dict(
     SESSION_COOKIE_DOMAIN = srvconf['PYSRV_DOMAIN_NAME'] if not IS_LOCAL_DEV else None,
 )
 
+# dump sql statements in log file?
+PYSRV_LOG_SQL = srvconf.get('PYSRV_LOG_SQL')
+
