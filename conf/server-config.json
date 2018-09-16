@@ -8,6 +8,7 @@
     "PYSRV_DATABASE_USER": "tm",
     "PYSRV_DATABASE_PASSWORD": "",
 
+    "PYSRV_COOKIE_HTTPS_ONLY": false,
     "PYSRV_REDIS_HOST": "localhost",
     "PYSRV_DOMAIN_NAME": "mydomain.com"
 }
