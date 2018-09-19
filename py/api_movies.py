@@ -55,7 +55,7 @@ def movie_create():
     m.creator = g.MYSELF
     m.save()
 
-    return jsonify(m), 200
+    return jsonify(m), 201
 
 
 @app.route('/api/movies/<id>', methods = ['PUT'])

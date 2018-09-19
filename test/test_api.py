@@ -58,7 +58,7 @@ class Tests(unittest.TestCase):
                    "fname":"Tomi", "lname":"Mickelsson"}
         self.call(URL_SIGNUP, 400, payload) # password too small
         payload["password"] = "123abC"
-        self.call(URL_SIGNUP, 200, payload)
+        self.call(URL_SIGNUP, 201, payload)
 
         reply = self.call(URL_ME, 200)
 
@@ -88,9 +88,9 @@ class Tests(unittest.TestCase):
         self.assertEqual([], self.call(URL_MOVIES))
 
         payload = {"title":"Forrest Gump", "director":"Robert Zemeckis"}
-        self.call(URL_MOVIES, 200, payload)
+        self.call(URL_MOVIES, 201, payload)
         payload = {"title":"Matrix", "director":"Lana Wachowsk"}
-        self.call(URL_MOVIES, 200, payload)
+        self.call(URL_MOVIES, 201, payload)
 
         reply = self.call(URL_MOVIES)
         self.assertEqual(2, len(reply))

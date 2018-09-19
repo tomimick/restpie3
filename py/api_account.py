@@ -81,7 +81,7 @@ def signup():
 
     log.info("SIGNUP OK agent={}".format(webutil.get_agent()))
 
-    return jsonify(u), 200
+    return jsonify(u), 201
 
 
 @app.route('/api/logout', methods = ['POST'])
