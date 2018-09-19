@@ -50,7 +50,7 @@ def migrate(migrator, database, fake=False, **kwargs):
         first_name text,
         last_name text,
         role type_user_role DEFAULT 'readonly',
-        tags integer[]
+        tags text[]
     )""")
     # normal integer-id: id serial PRIMARY KEY NOT NULL,
 
