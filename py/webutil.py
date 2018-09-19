@@ -27,7 +27,7 @@ Session(app)
 
 
 # --------------------------------------------------------------------------
-# API decorators
+# API decorator
 
 def login_required(func=None, role=None):
     """Decorator: must be logged on, and optionally must have the given role.
@@ -44,18 +44,21 @@ def login_required(func=None, role=None):
     return inner
 
 
-def _check_user_role(role):
-    """Check that my role is atleast the given role. If not, log and return
-    an error."""
-
-    if not g.MYSELF or not g.MYSELF.is_role_atleast(role):
-        err = "Unauthorized! {} {} user={}".format(
-                request.method, request.path, g.MYSELF)
-        return warn_reply(err, 401)
-
-
 # --------------------------------------------------------------------------
-# log error, get data about the request
+# get data about me, return error replys
+
+def get_myself():
+    """Return the user object of the caller or None if he is a visitor.
+    Loads the user from the database, then caches it during request."""
+
+    if not "userid" in session:
+        return None
+
+    if hasattr(g, "MYSELF"):
+        return g.MYSELF # use cache
+    else:
+        g.MYSELF = db.get_user(session["userid"])
+        return g.MYSELF
 
 def error_reply(errmsg, httpcode=400):
     """Logs an error and returns error code to the caller."""
@@ -108,21 +111,11 @@ def before_request():
     # have common data available in global g
     # but do not pollute g, store only the most relevant data
     g.HOST = request.headers.get('X-Real-Host', '')
+    g.ISLOGGED = "userid" in session
+    myrole = session.get("role") or ""
+    g.IS_SUPER_USER = myrole == "superuser"
 
-    # load current user from db
-    g.MYSELF = me = None
-    if "userid" in session:
-        try:
-            g.MYSELF = me = db.get_user(session['userid'])
-        except:
-            # odd error, clear session!
-            session.clear()
-            return webutil.error_reply("unknown uid")
-
-    g.ISLOGGED = me != None
-    g.IS_SUPER_USER = me and me.role == "superuser"
-
-    if me and me.role == "disabled":
+    if myrole == "disabled":
         err = "account disabled"
         log.warn(err)
         return jsonify({"err":err}), 400
@@ -211,7 +204,35 @@ def init_logging():
 
 
 # --------------------------------------------------------------------------
-# serializing models - REST JSON encoder
+# internal methods, serializing models
+
+def _check_user_role(rolebase):
+    """Check that my role is atleast the given role. If not, log and return
+    an error."""
+
+    myrole = session.get("role") or ""
+
+    if not _is_role_atleast(myrole, rolebase):
+        uid = session.get("userid") or ""
+        err = "Unauthorized! {} {} user={}".format(
+                request.method, request.path, uid)
+        return warn_reply(err, 401)
+
+def _is_role_atleast(myrole, rolebase):
+    """Checks that myrole is same or above rolebase. Assumes a
+    simple role model where roles can be arranged from lowest
+    access to highest access level."""
+
+    if not rolebase:
+        # no role required, but I need to be logged-on
+        return "userid" in session
+
+    levels = {"readonly":1, "editor":2, "admin":3, "superuser":4}
+    try:
+        return levels[myrole] >= levels[rolebase]
+    except:
+        return False
+
 
 class MyJSONEncoder(JSONEncoder):
     def default(self, obj):

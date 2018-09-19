@@ -31,6 +31,7 @@ def build_session(user_obj, is_permanent=True):
 
     # fill with relevant data
     session['userid'] = user_obj.id
+    session['role'] = user_obj.role # if you update user.role, update this too
 
     # remember session even over browser restarts?
     session.permanent = is_permanent

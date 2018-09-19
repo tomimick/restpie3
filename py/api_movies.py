@@ -12,7 +12,7 @@ from playhouse.shortcuts import dict_to_model, update_model_from_dict
 
 import db
 import util
-from webutil import app, login_required
+from webutil import app, login_required, get_myself
 
 import logging
 log = logging.getLogger("api.movies")
@@ -52,7 +52,7 @@ def movie_create():
 
     m = dict_to_model(db.Movie, input)
     m.modified = m.created = util.utcnow()
-    m.creator = g.MYSELF
+    m.creator = get_myself()
     m.save()
 
     return jsonify(m), 201

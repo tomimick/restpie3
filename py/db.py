@@ -91,19 +91,6 @@ class User(BaseModel):
     def full_name(self):
         return "{} {}".format(self.first_name, self.last_name or '')
 
-    def is_role_atleast(self, role):
-        """Checks that my role is same or above the given role. Assumes a
-        simple role model where roles can be arranged from lowest
-        access to highest access level."""
-
-        if not role:
-            return True
-        levels = {"readonly":1, "editor":2, "admin":3, "superuser":4}
-        try:
-            return levels[self.role] >= levels[role]
-        except:
-            return False
-
     def serialize(self):
         """Serialize this object to dict/json."""
 

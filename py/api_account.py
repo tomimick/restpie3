@@ -10,7 +10,7 @@ from flask import request, session, g, jsonify
 import db
 import webutil
 import account
-from webutil import app, login_required
+from webutil import app, login_required, get_myself
 
 import logging
 log = logging.getLogger("api")
@@ -97,7 +97,7 @@ def logout():
 def me():
     """Return info about me. Attach more data for real use."""
 
-    me = g.MYSELF
+    me = get_myself()
     reply = {"me": me}
 
     return jsonify(reply), 200
