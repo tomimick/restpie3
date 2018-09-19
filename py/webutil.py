@@ -142,6 +142,9 @@ def after_request(response):
         logmethod("  {} {} {}".format(response.status_code,
             request.method, request.url))
 
+    # set CORS headers
+    response.headers['Access-Control-Allow-Origin'] = config.CORS_ALLOW_ORIGIN
+
     return response
 
 @app.teardown_request

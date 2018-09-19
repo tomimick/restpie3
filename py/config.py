@@ -61,3 +61,6 @@ flask_config = dict(
 # dump sql statements in log file?
 PYSRV_LOG_SQL = srvconf.get('PYSRV_LOG_SQL')
 
+# allow API access to this domain
+CORS_ALLOW_ORIGIN = srvconf.get('PYSRV_CORS_ALLOW_ORIGIN', '*')
+
