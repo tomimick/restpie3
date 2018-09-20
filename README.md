@@ -1,6 +1,6 @@
 
-Python API Server
-=================
+RESTPie3 - Python REST API Server Starter Kit
+=============================================
 
 This is a lightweight REST API server implemented in Python3 offering the
 essential web service features with a simple and solid foundation. The
