@@ -160,7 +160,7 @@ The whole of this server fits into a small set of files:
 │   ├── /favicon.ico        #   site icon
 │   ├── /pydaemon.service   #   systemd daemon config (if you run in a VPS)
 │   ├── /robots.txt         #   deny all from robots
-│   ├── /server-config.json #   pyserver config: db, redis, etc
+│   ├── /server-config.json #   main server config: db, redis, etc
 │   └── /uwsgi.ini          #   uwsgi daemon config, for localdev & server
 ├── /migrations/            # db migrations, schema changes
 │   ├── /001_users.py       #   users table, the foundation
@@ -181,7 +181,7 @@ The whole of this server fits into a small set of files:
 ├── /scripts/               # scripts
 │   └── /dbmigrate.py       #   db migration
 ├── /templates/             # templates (if you really need them)
-│   └── /example.html       #   very basic example only
+│   └── /example.html       #   very basic jinja2 example
 ├── /test/                  # test scripts
 │   ├── /quick.sh           #   quick adhoc calls with httpie
 │   ├── /test_api.py        #   test API methods
@@ -459,7 +459,8 @@ You start the above method in a background worker process like this:
 ```
 
 The number of background worker processes is controlled by `spooler-processes`
-configuration in [uwsgi.ini](conf/uwsgi.ini).
+configuration in [uwsgi.ini](conf/uwsgi.ini). The spooled data is written and
+read into a temp file on disk, not in Redis.
 
 Crons are useful for running background tasks in specified times, like in
 every hour or every night. uwsgi has an easy built-in support for crons. To
@@ -467,6 +468,7 @@ have a nightly task you simple code:
 
 ```python
     @cron(0,2,-1,-1,-1)
+    #(minute, hour, day, month, weekday) - in server local time
     def daily(num):
         """Runs every night at 2:00AM."""
         #...code here...
@@ -570,9 +572,9 @@ the whole server. Not every project needs a big cluster first.
 Setting up a whole cluster at [AWS ECS](https://aws.amazon.com/ecs/) is no
 easy feat, you need to learn and configure A LOT.
 [Dokku](http://dokku.viewdocs.io/dokku/) seems nice but has limitations,
-allowing to run only a single Docker build. I wish the container/Kubernetes industry still matures more and provides a
+allowing to run only a single Docker image. I wish the container/Kubernetes industry still matures more and provides a
 [Heroku](https://www.heroku.com/)-like effortless deployments of Docker
-builds.
+images.
 
 So if you have plain VPS servers, and want to have super speedy updates from
 localhost to the servers, I have created a single Python script
@@ -707,7 +709,7 @@ This server is not a toy - it is a practical, solid server that is based on my
 experience in building full-stack services over the years.
 
 If you need dev power in building your great service, back or front, you can
-[contact me](mailto:tomi.mickelsson@iki.fi) to ask if I am available for
+[contact me](mailto:tomi.mickelsson@gmail.com) to ask if I am available for
 freelancing work.
 
 
