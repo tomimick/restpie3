@@ -336,7 +336,9 @@ method that controls that the method requires an authenticated user session,
 and optionally to specify if the method requires a certain user level. User
 accounts have a role-field whose value is one of:
 
+```python
     user.role = (disabled, readonly, editor, admin, superuser)
+```
 
 You can set the user roles that are meaningful for your project, see the
 migration [001_users.py](migrations/001_users.py). If this simple linear role
@@ -346,11 +348,13 @@ array field, similar to `user.tags`.
 For example, this method requires that the user is logged on and has a role
 editor:
 
+```python
     @app.route('/api/movies/', methods = ['POST'])
     @login_required(role='editor')
     def movie_create():
         """Creates a movie and returns it."""
         #...code here...
+```
 
 If the user does not have an editor role or above, the API server returns 401
 Unauthorized to the client.
@@ -416,13 +420,17 @@ secondary in nature and does not belong to the master database).
 The module [red.py](py/red.py) provides simple methods for using Redis. To
 store a dict in Redis for 1 minute, you call:
 
+```python
     value = {"type":"cat", "name":"Sophia"}
     red.set_keyval("mykey", value, 60)
+```
 
 To append data into a LIFO list with a maximum size of 100, you call:
 
+```python
     data_item = {"action":"resize", "url":"https://example.org/a.jpg"}
     red.list_append("mylist", data_item, 100)
+```
 
 red.py can be extended to cover more functionality that
 [Redis provides](https://redis.io/commands).
@@ -436,15 +444,19 @@ worker processes.
 
 In any Python module (like in [bgtasks.py](py/bgtasks.py)) you have this code:
 
+```python
     @spool(pass_arguments=True)
     def send_email(*args, **kwargs):
         """A background worker that is executed by spooling arguments to it."""
         #...code here...
+```
 
 You start the above method in a background worker process like this:
 
+```python
     bgtasks.send_email.spool(email="tomi@tomicloud.com",
             subject="Hello world!", template="welcome.html")
+```
 
 The number of background worker processes is controlled by `spooler-processes`
 configuration in [uwsgi.ini](conf/uwsgi.ini).
@@ -453,10 +465,12 @@ Crons are useful for running background tasks in specified times, like in
 every hour or every night. uwsgi has an easy built-in support for crons. To
 have a nightly task you simple code:
 
+```python
     @cron(0,2,-1,-1,-1)
     def daily(num):
         """Runs every night at 2:00AM."""
         #...code here...
+```
 
 
 Logging
