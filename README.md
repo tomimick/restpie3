@@ -7,6 +7,8 @@ essential web service features with a simple and solid foundation. The
 codebase is small and clean, containing few core components that do the job
 well. Fork and create your own REST API server quickly.
 
+Created on Sep 2018
+
 **Table of contents**
 
 * [Features](#features)
@@ -156,7 +158,7 @@ The whole of this server fits into a small set of files:
 ```
 ├── /conf/                  # configuration files
 │   ├── /favicon.ico        #   site icon
-│   ├── /pydaemon.service   #   systemd daemon config
+│   ├── /pydaemon.service   #   systemd daemon config (if you run in a VPS)
 │   ├── /robots.txt         #   deny all from robots
 │   ├── /server-config.json #   pyserver config: db, redis, etc
 │   └── /uwsgi.ini          #   uwsgi daemon config, for localdev & server
@@ -175,7 +177,7 @@ The whole of this server fits into a small set of files:
 │   ├── /main.py            #   server main
 │   ├── /red.py             #   redis: get/set keyvals, lists, atomic
 │   ├── /util.py            #   misc utility functions
-│   └── /webutil.py         #   core web flow: before/after request, roles
+│   └── /webutil.py         #   core web flow: before/after request, auth, role check
 ├── /scripts/               # scripts
 │   └── /dbmigrate.py       #   db migration
 ├── /templates/             # templates (if you really need them)
@@ -215,7 +217,6 @@ route.)
 
 Install the 2 external components PostgreSQL and Redis, their latest versions:
 
-    brew update
     brew install redis
     brew install postgresql
 
@@ -240,7 +241,6 @@ dependencies.  Let's create and activate our environment:
 Redis does not require more setup. For PostgreSQL, create the database and
 the user: (pick your own names and secrets for the capital parts!)
 
-    sudo su - postgres
     createuser MY_USER
     createdb -O tm MY_DATABASE
     psql MY_DATABASE
@@ -250,8 +250,8 @@ the user: (pick your own names and secrets for the capital parts!)
 
 Download the sources to your local disk and install dependencies:
 
-    git clone https://github.com/tomimick/tm-python-server-starter
-    cd tm-python-server-starter
+    git clone https://github.com/tomimick/restpie3
+    cd restpie3
     pip3 install -r requirements.txt
 
 Then clone the [config template json](conf/server-config.json) into a file
@@ -299,7 +299,7 @@ The available API methods are implemented in api_x.py modules:
 
 The server has built-in little [introspection](#screenshot) for listing the available APIs as
 a HTML page.  You just declare, implement and document the API methods
-normally with the Flask decorators, docstrings and the methods will be
+normally with the Flask decorator, docstrings and the methods will be
 automatically listed at
 [localhost:8100/api/list](http://localhost:8100/api/list). This is a neat way
 to document your server API. You can decide whether you want to disable this
@@ -365,7 +365,7 @@ If you want to support Facebook or Google OAuth authentication method, I
 recommend you use the [rauth](https://github.com/litl/rauth) library.
 
 By default the server allows accessing the API from all domains, CORS
-Access-Control-Allow-Origin value is '*' but it can be set in the config file.
+`Access-Control-Allow-Origin value='*'` but it can be set in the config file.
 
 
 Session data
@@ -431,17 +431,17 @@ red.py can be extended to cover more functionality that
 Background workers & cron
 -------------------------
 
-uwsgi provides a simple mechanism to let background workers execute long
-running tasks.
+uwsgi provides a simple mechanism to run long running tasks in background
+worker processes.
 
-In the worker module (like in [bgtasks.py](py/bgtasks.py)) you have this code:
+In any Python module (like in [bgtasks.py](py/bgtasks.py)) you have this code:
 
     @spool(pass_arguments=True)
     def send_email(*args, **kwargs):
         """A background worker that is executed by spooling arguments to it."""
         #...code here...
 
-You execute the above worker method from anywhere with code:
+You start the above method in a background worker process like this:
 
     bgtasks.send_email.spool(email="tomi@tomicloud.com",
             subject="Hello world!", template="welcome.html")
@@ -556,9 +556,9 @@ the whole server. Not every project needs a big cluster first.
 Setting up a whole cluster at [AWS ECS](https://aws.amazon.com/ecs/) is no
 easy feat, you need to learn and configure A LOT.
 [Dokku](http://dokku.viewdocs.io/dokku/) seems nice but has limitations,
-allowing to run only a single Docker build. I wish the container industry
-still matures more and provides a [Heroku](https://www.heroku.com/)-like
-effortless deployments of Docker builds.
+allowing to run only a single Docker build. I wish the container/Kubernetes industry still matures more and provides a
+[Heroku](https://www.heroku.com/)-like effortless deployments of Docker
+builds.
 
 So if you have plain VPS servers, and want to have super speedy updates from
 localhost to the servers, I have created a single Python script
@@ -597,8 +597,10 @@ Install PostgreSQL and Redis at server:
 Then configure PostgreSQL at server in a similar way as explained for a local
 setup [above](#setup-local-dev-environment).
 
-Write the IP-address or server name locally in your fabfile.py as TEST_SERVER.
-Then transfer source files to the server, and install the systemd daemon:
+Write the IP-address or server name locally in your fabfile.py as
+TEST_SERVER. Plus add your SSH credentials and a path to your public key.
+Then transfer source files to the server, and install the
+[systemd daemon](conf/pydaemon.service):
 
     # locally
     fab deploy
@@ -691,8 +693,8 @@ This server is not a toy - it is a practical, solid server that is based on my
 experience in building full-stack services over the years.
 
 If you need dev power in building your great service, back or front, you can
-[contact me](mailto:atomi@iki.fi) to ask if I am available for freelancing
-work.
+[contact me](mailto:tomi.mickelsson@iki.fi) to ask if I am available for
+freelancing work.
 
 
 License
