@@ -2,10 +2,10 @@
 RESTPie3 - Python REST API Server Starter Kit
 =============================================
 
-This is a lightweight REST API server implemented in Python3 offering the
-essential web service features with a simple and solid foundation. The
-codebase is small and clean, containing few core components that do the job
-well. Fork and create your own REST API server quickly.
+This is a lightweight REST API server implemented in Python3 offering
+essential web service features in a simple package. This is not a framework,
+just a practical and clean codebase that relies on few core components that do
+the job well. Fork and create your own REST API server quickly.
 
 Created on Sep 2018
 
@@ -112,11 +112,16 @@ I have years of experience of.
   [SQLAlchemy](https://www.sqlalchemy.org/) library. I know SQL and like to
   operate at the row level, and have explicit control.
   Peewee makes database access a breeze and allows you to execute raw
-  SQL if you need the full power of the database.
+  SQL if you need the full power of the database. Peewee supports SQLite,
+  MySQL and PostgreSQL.
 
   For scheme migrations,
   [Peewee-migrate](https://github.com/klen/peewee_migrate) is an easy choice
   that fits well with Peewee.
+
+
+If you'd like to replace some of these components, it is possible, this is a
+small codebase.
 
 
 What about the front-end?
@@ -417,18 +422,29 @@ A typical case might be that a background worker puts the calculation results
 into Redis where the data is picked from by an API method (if the result is
 secondary in nature and does not belong to the master database).
 
-The module [red.py](py/red.py) provides simple methods for using Redis. To
-store a dict in Redis for 1 minute, you call:
+The module [red.py](py/red.py) provides simple methods for using Redis:
 
 ```python
+    # store a value into Redis (here value is a dict but can be anything)
     value = {"type":"cat", "name":"Sophia"}
-    red.set_keyval("mykey", value, 60)
+    red.set_keyval("mykey", value)
+
+    # get a value
+    value = red.set_keyval("mykey")
+
+    # store a value that will expire/disappear after 70 minutes:
+    red.set_keyval("cron_calculation_cache", value, 70*60)
 ```
 
-To append data into a LIFO list with a maximum size of 100, you call:
+To append data into a list:
 
 ```python
-    data_item = {"action":"resize", "url":"https://example.org/a.jpg"}
+    # append item into a list
+    item = {"action":"resize", "url":"https://example.org/a.jpg"}
+    red.list_append("mylist", item)
+
+    # append item into a FIFO list with a max size of 100
+    # (discards the oldest items first)
     red.list_append("mylist", data_item, 100)
 ```
 
