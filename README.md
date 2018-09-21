@@ -430,7 +430,7 @@ The module [red.py](py/red.py) provides simple methods for using Redis:
     red.set_keyval("mykey", value)
 
     # get a value
-    value = red.set_keyval("mykey")
+    value = red.get_keyval("mykey")
 
     # store a value that will expire/disappear after 70 minutes:
     red.set_keyval("cron_calculation_cache", value, 70*60)
@@ -442,6 +442,9 @@ To append data into a list:
     # append item into a list
     item = {"action":"resize", "url":"https://example.org/a.jpg"}
     red.list_append("mylist", item)
+
+    # take first item from a list
+    item = red.list_pop("mylist")
 
     # append item into a FIFO list with a max size of 100
     # (discards the oldest items first)
