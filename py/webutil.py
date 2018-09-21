@@ -144,6 +144,8 @@ def after_request(response):
 
     # set CORS headers
     response.headers['Access-Control-Allow-Origin'] = config.CORS_ALLOW_ORIGIN
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
 
     return response
 
