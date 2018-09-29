@@ -1,53 +1,60 @@
-INF anon@local 091918-11:06:34 webutil.py PO /apitest/dbtruncate
-INF anon@local 091918-11:06:34 webutil.py GE /api/login
-ERR anon@local 091918-11:06:34 webutil.py   405 GET http://localhost:8100/api/login
-INF anon@local 091918-11:06:34 webutil.py GE /api/signup
-ERR anon@local 091918-11:06:34 webutil.py   405 GET http://localhost:8100/api/signup
-INF anon@local 091918-11:06:34 webutil.py GE /api/logout
-ERR anon@local 091918-11:06:34 webutil.py   405 GET http://localhost:8100/api/logout
-INF anon@local 091918-11:06:34 webutil.py PO /api/login {'email': 'a@example.com', 'password': 'X'}
-WAR anon@local 091918-11:06:34 webutil.py Invalid login credentials
-ERR anon@local 091918-11:06:34 webutil.py   400 POST http://localhost:8100/api/login
-INF anon@local 091918-11:06:34 webutil.py PO /api/signup {'email': 'a@example.com', 'password': 'X'}
-WAR anon@local 091918-11:06:34 webutil.py Invalid signup input
-ERR anon@local 091918-11:06:34 webutil.py   400 POST http://localhost:8100/api/signup
-INF anon@local 091918-11:06:34 webutil.py PO /api/signup {'email': 'tomi@example.com', 'password': 'X', 'fname': 'Tomi', 'lname': 'Mickelsson'}
-ERR anon@local 091918-11:06:34 account.py password validity: Password must be atleast 6 characters
-ERR anon@local 091918-11:06:34 webutil.py   400 POST http://localhost:8100/api/signup
-INF anon@local 091918-11:06:34 webutil.py PO /api/signup {'email': 'tomi@example.com', 'password': 'X', 'fname': 'Tomi', 'lname': 'Mickelsson'}
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 api_account.py SIGNUP OK agent=Python API Test
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/me
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/me
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py PO /api/logout
-INF anon@local 091918-11:06:35 webutil.py PO /api/me
-ERR anon@local 091918-11:06:35 webutil.py   405 POST http://localhost:8100/api/me
-INF anon@local 091918-11:06:35 webutil.py GE /api/me
-WAR anon@local 091918-11:06:35 webutil.py Unauthorized! GET /api/me user=None
-ERR anon@local 091918-11:06:35 webutil.py   401 GET http://localhost:8100/api/me
-INF anon@local 091918-11:06:35 webutil.py PO /api/signup {'email': 'tomi@example.com', 'password': 'X', 'fname': 'Tomi', 'lname': 'Mickelsson'}
-WAR anon@local 091918-11:06:35 webutil.py Signup email taken: tomi@example.com
-ERR anon@local 091918-11:06:35 webutil.py   400 POST http://localhost:8100/api/signup
-INF anon@local 091918-11:06:35 webutil.py PO /api/login {'email': 'tomi@example.com', 'password': 'X'}
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 api_account.py LOGIN OK agent=Python API Test
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/users
-WAR 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py Unauthorized! GET /api/users user=<User 8e8cf94d-5110-4fa2-8c95-d062c6bf850d, tomi@example.com, role=editor>
-ERR 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py   401 GET http://localhost:8100/api/users
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py PO /api/login {'email': 'tomi@example.com', 'password': 'X'}
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 api_account.py LOGIN OK agent=Python API Test
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py PO /api/movies/ {'title': 'Forrest Gump', 'director': 'Robert Zemeckis'}
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py PO /api/movies/ {'title': 'Matrix', 'director': 'Lana Wachowsk'}
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/205
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py PU /api/movies/205 {'director': 'Lana Wachowski'}
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/205
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/ ImmutableMultiDict([('search', 'matrix')])
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/ ImmutableMultiDict([('search', 's')])
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/ ImmutableMultiDict([('creator', '8e8cf94d-5110-4fa2-8c95-d062c6bf850d')])
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py DE /api/movies/205
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py DE /api/movies/204
-INF 8e8cf94d-5110-4fa2-8c95-d062c6bf850d@local 091918-11:06:35 webutil.py GE /api/movies/
-INF   -WORKER@local 091918-11:07:22 cron.py every_minute
+INF anon@local 270918-09:06:59 webutil.py PO /apitest/dbtruncate
+INF anon@local 270918-09:06:59 webutil.py GE /api/login
+ERR anon@local 270918-09:06:59 webutil.py [91m  405 GET http://localhost:8100/api/login[0m
+INF anon@local 270918-09:06:59 webutil.py GE /api/signup
+ERR anon@local 270918-09:06:59 webutil.py [91m  405 GET http://localhost:8100/api/signup[0m
+INF anon@local 270918-09:06:59 webutil.py GE /api/logout
+ERR anon@local 270918-09:06:59 webutil.py [91m  405 GET http://localhost:8100/api/logout[0m
+INF anon@local 270918-09:06:59 webutil.py PO /api/login {'email': 'a@example.com', 'password': 'X'}
+WAR anon@local 270918-09:06:59 webutil.py [93mInvalid login credentials[0m
+ERR anon@local 270918-09:06:59 webutil.py [91m  400 POST http://localhost:8100/api/login[0m
+INF anon@local 270918-09:06:59 webutil.py PO /api/signup {'email': 'a@example.com', 'password': 'X'}
+WAR anon@local 270918-09:06:59 webutil.py [93mInvalid signup input[0m
+ERR anon@local 270918-09:06:59 webutil.py [91m  400 POST http://localhost:8100/api/signup[0m
+INF anon@local 270918-09:06:59 webutil.py PO /api/signup {'email': 'tomi@example.com', 'password': 'X', 'fname': 'Tomi', 'lname': 'Mickelsson'}
+ERR anon@local 270918-09:06:59 account.py [91mpassword validity: Password must be atleast 6 characters[0m
+ERR anon@local 270918-09:06:59 webutil.py [91m  400 POST http://localhost:8100/api/signup[0m
+INF anon@local 270918-09:06:59 webutil.py PO /api/signup {'email': 'tomi@example.com', 'password': 'X', 'fname': 'Tomi', 'lname': 'Mickelsson'}
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 api_account.py SIGNUP OK agent=Python API Test
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py GE /api/me
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py GE /api/me
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py PO /api/logout
+INF anon@local 270918-09:06:59 webutil.py PO /api/me
+ERR anon@local 270918-09:06:59 webutil.py [91m  405 POST http://localhost:8100/api/me[0m
+INF anon@local 270918-09:06:59 webutil.py GE /api/me
+WAR anon@local 270918-09:06:59 webutil.py [93mUnauthorized! GET /api/me user=[0m
+ERR anon@local 270918-09:06:59 webutil.py [91m  401 GET http://localhost:8100/api/me[0m
+INF anon@local 270918-09:06:59 webutil.py PO /api/signup {'email': 'tomi@example.com', 'password': 'X', 'fname': 'Tomi', 'lname': 'Mickelsson'}
+WAR anon@local 270918-09:06:59 webutil.py [93mSignup email taken: tomi@example.com[0m
+ERR anon@local 270918-09:06:59 webutil.py [91m  400 POST http://localhost:8100/api/signup[0m
+INF anon@local 270918-09:06:59 webutil.py PO /api/login {'email': 'tomi@example.com', 'password': 'X'}
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 api_account.py LOGIN OK agent=Python API Test
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py GE /api/users
+WAR 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py [93mUnauthorized! GET /api/users user=2770060c-ebea-495f-b93f-509196e4bc73[0m
+ERR 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py [91m  401 GET http://localhost:8100/api/users[0m
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py PO /api/login {'email': 'tomi@example.com', 'password': 'X'}
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 api_account.py LOGIN OK agent=Python API Test
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py GE /api/movies/
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py PO /api/movies/ {'title': 'Forrest Gump', 'director': 'Robert Zemeckis'}
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py PO /api/movies/ {'title': 'Matrix', 'director': 'Lana Wachowsk'}
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py GE /api/movies/
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py GE /api/movies/306
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py PU /api/movies/306 {'director': 'Lana Wachowski'}
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:06:59 webutil.py GE /api/movies/306
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:07:00 webutil.py GE /api/movies/
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:07:00 webutil.py GE /api/movies/ ImmutableMultiDict([('search', 'matrix')])
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:07:00 webutil.py GE /api/movies/ ImmutableMultiDict([('search', 's')])
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:07:00 webutil.py GE /api/movies/ ImmutableMultiDict([('creator', '2770060c-ebea-495f-b93f-509196e4bc73')])
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:07:00 webutil.py DE /api/movies/306
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:07:00 webutil.py GE /api/movies/
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:07:00 webutil.py DE /api/movies/305
+INF 2770060c-ebea-495f-b93f-509196e4bc73@local 270918-09:07:00 webutil.py GE /api/movies/
+INF   -WORKER@local 270918-09:07:22 cron.py every_minute
+INF   -WORKER@local 270918-09:08:22 cron.py every_minute
+SIGINT/SIGQUIT received...killing workers...
+killing the spooler with pid 55972
+gateway "uWSGI http 1" has been buried (pid: 55974)
+spooler (pid: 55972) annihilated
+worker 1 buried after 1 seconds
+goodbye to uWSGI.
 

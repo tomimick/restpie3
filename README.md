@@ -49,7 +49,7 @@ A quick list of the features of this Python API server:
 * Email & password authentication with secure algorithms
 * User role model and authorization of API methods via simple decorator
 * Logging system with practical data for troubleshooting, detects slow
-  requests
+  requests, warnings&errors colorized
 * Server reload on code change
 * Database migrations
 * Docker image for the "big cloud"
@@ -144,13 +144,17 @@ need a few server generated HTML pages, you can take a look of included
 [example.html](templates/example.html).
 
 If you want inspiration of how to develop a modern web front-end that consumes
-a REST API, take a look of my 2 open-sourced starter kits, one developed with
-[React/Nextjs](https://github.com/tomimick/tm-nextjs-starter) and the other
-with [Vue/Nuxtjs](https://github.com/tomimick/tm-nuxtjs-starter).  React and
-Vue are currently the most popular Javascript frameworks to create front-ends.
+a REST API, take a look of my two open-source starter kits:
 
-The 2 front-end starters and this server handle movie data as an example. You
-can connect the 2 front-ends to this server but first you need to allow
+* [React/Nextjs starter](https://github.com/tomimick/tm-nextjs-starter)
+* [Vue/Nuxtjs starter](https://github.com/tomimick/tm-nuxtjs-starter)
+
+React and Vue are currently the most popular Javascript frameworks to create
+front-ends, followed by Angular which is a bit heavier, suited for bigger
+bisness apps.
+
+The two front-end starters and this server handle movie data as an example. You
+can connect the front-ends to this server but first you need to allow
 visitor access for the API methods in `api_movies.py` as the front-ends do not
 implement a login.
 
@@ -535,6 +539,16 @@ on this.
 To monitor the log file in realtime at server you can invoke:
 
     tail -f -n 500 /app/app.log
+
+To see the logged errors only, in most recent first order:
+
+    tac /app/app.log | grep "^ERR " | less -r
+
+This starter comes with a simple log line colorizer out of the box, hilighting
+warnings and errors with a simple logging.Formatter. This is convenient but
+the escape codes are inserted into the log file. If you want to have a more
+powerful logging colorizer, take a look of
+[grc](https://github.com/garabik/grc) for example.
 
 As an example, the server logs [this output](test/sample.log.txt) when the
 included API tests are run.
