@@ -3,6 +3,11 @@
 
 # cron.py: cron tasks (called by uwsgi daemon, not linux cron)
 #
+#   - Note that these funcs are subject to the same "harakiri" timeout as
+#   regular requests. If you need to run longer, spool a background worker
+#   from a cron func. Spooler workers have a timeout "spooler-harakiri"
+#   specified in uwsgi.ini.
+#
 # Author: Tomi.Mickelsson@iki.fi
 
 from uwsgidecorators import timer, cron, filemon
