@@ -742,8 +742,8 @@ This server is not a toy - it is a practical, solid server that is based on my
 experience in building full-stack services over the years.
 
 If you need dev power in building your great service, back or front, you can
-[contact me](mailto:tomi.mickelsson@gmail.com) to ask if I am available for
-freelancing work.
+[email me](mailto:tomi.mickelsson@gmail.com) to ask if I am available for
+freelancing work. Check my blog at [tomicloud.com](https://tomicloud.com).
 
 
 License
