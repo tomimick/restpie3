@@ -80,6 +80,8 @@ def list_pop(name, timeout=None):
 
     if timeout != None:
         s = rdb.blpop(name, timeout=timeout)
+        if s:
+            s = s[1] # with timeout, value is the 2nd item
     else:
         s = rdb.lpop(name)
     return pickle.loads(s) if s else None
