@@ -7,7 +7,7 @@ essential web service features in a simple package. This is not a framework,
 just a practical and clean codebase that relies on few core components that do
 the job well. Fork and create your own REST API server quickly.
 
-Created on Sep 2018
+Open sourced on Sep 2018 after years of production use at multiple sites.
 
 **Table of contents**
 
@@ -24,8 +24,9 @@ Created on Sep 2018
 * [Logging](#logging)
 * [Tests](#tests)
 * [Docker](#docker)
-* [Script deployment](#script-deployment)
-* [Setup the server](#setup-the-server)
+* [Script deployment to VPS](#script-deployment-to-vps)
+* [Setup VPS server](#setup-vps-server)
+* [Nginx](#nginx)
 * [Security](#security)
 * [Scaling up](#scaling-up)
 * [Need help?](#need-help)
@@ -53,7 +54,7 @@ A quick list of the features of this Python API server:
 * Server reload on code change
 * Database migrations
 * Docker image for the "big cloud"
-* Fast rsync deployment of updates to servers
+* Fast rsync deployment of updates to VPS servers
 * Tests for the API
 
 
@@ -394,7 +395,10 @@ session data are automatically saved to Redis by Flask at the end of the
 request.
 
 This starter stores two core data in the session: `userid` and `role` of the
-user.
+user. (Role-field is in session for performance reason: otherwise we would
+need to query it from the database with EVERY request that specifies
+login_required. Note that if the user role changes, you need to update it in
+session too.)
 
 A common operation in an API method is to access the calling user object,
 myself.  There is a call `webutil.get_myself()` that loads myself from the
@@ -593,8 +597,8 @@ use volumes that map Linux folders to your host folders and enable uwsgi hot
 reload `py-autoreload=1` on code change.
 
 
-Script deployment
------------------
+Script deployment to VPS
+------------------------
 
 Even though the world is crazy about Docker, I still often like to deploy code
 directly and quickly to VPS servers, especially during project start and early
@@ -625,7 +629,7 @@ In any case, this is just an optional script. If you have a big environment,
 you most likely have a Continous Integration / Deployment solution in place.
 
 
-Setup the server
+Setup VPS server
 ----------------
 
 Here are rough steps about how to setup a VPS server for this Python server.
@@ -672,6 +676,48 @@ And finally re-deploy: (does database migration, server restart)
 
 For a production setup you must also configure uwsgi to run as a lower
 privileged user and not as a root! Check the [uwsgi guide](https://uwsgi-docs.readthedocs.io/en/latest/).
+
+
+Nginx
+-----
+
+Few words about Nginx: if you want to run this API server and your front-end
+under the same domain, and you are using Nginx, you can have the following
+Nginx config to send all /api/ requests to Python server and other requests to
+other destinations, like to Node and file system:
+
+
+        # in nginx config:
+
+        # to python api server
+        location /api/ {
+            uwsgi_pass localhost:8010;
+            include uwsgi_params;
+            uwsgi_param  X-Real-IP  $remote_addr;
+            uwsgi_param  X-Real-Host $host;
+        }
+
+        # static files
+        location /static/ {
+            try_files $uri /index.html =404;
+        }
+
+        # to Node server
+        location / {
+            proxy_pass http://localhost:8080;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+
+
+And then enable the uwsgi-listener in [uwsgi.ini](conf/uwsgi.ini):
+
+        # in uwsgi.ini:
+        [uwsgi-production]
+        uwsgi-socket = localhost:8010
 
 
 Security
