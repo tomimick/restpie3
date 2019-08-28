@@ -15,7 +15,10 @@ RUN apk add --no-cache libpq
 # copy source files
 COPY conf /app/conf
 COPY py /app/py
+COPY migrations /app/migrations
+COPY scripts /app/scripts
 COPY templates /app/templates
+COPY test /app/test
 
 # background spooler dir
 RUN mkdir /tmp/pysrv_spooler
@@ -27,14 +30,22 @@ EXPOSE 80
 
 
 # our server config file
-# (you should write your own config file and put outside the repo!
-# here I use the template from repo and override with environment
-# variables, but you should not store secrets in this Dockerfile)
+# - you should write your own config file and put OUTSIDE the repository
+#   since the config file contains secrets
+# - here I use the sample template from repo
+# - it is also possible to override the config with env variables, either here
+#   or in Amazon ECS or Kubernetes configuration
 COPY conf/server-config.json /app/real-server-config.json
-# access postgresql+redis of the host
-ENV PYSRV_DATABASE_HOST host.docker.internal
-ENV PYSRV_REDIS_HOST host.docker.internal
-ENV PYSRV_DATABASE_PASSWORD x
+# ENV PYSRV_DATABASE_HOST host.docker.internal
+# ENV PYSRV_REDIS_HOST host.docker.internal
+# ENV PYSRV_DATABASE_PASSWORD x
 
-CMD ["uwsgi", "--ini", "/app/conf/uwsgi.ini:uwsgi-production"]
+# build either a production or dev image
+ARG BUILDMODE=production
+ENV ENVBUILDMODE=$BUILDMODE
+
+RUN echo "BUILDMODE $ENVBUILDMODE"
+
+# run in shell mode with ENV expansion
+CMD uwsgi --ini /app/conf/uwsgi.ini:uwsgi-$ENVBUILDMODE
 

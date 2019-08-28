@@ -17,8 +17,6 @@ from fabric.contrib.console import confirm
 from fabric.contrib.project import rsync_project
 from fabric.operations import prompt
 
-import config
-
 
 # write your own server info here:
 TEST_SERVER = "testserver.mydomain.com"

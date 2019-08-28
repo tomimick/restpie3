@@ -22,7 +22,7 @@ log = logging.getLogger("db")
 
 database = PostgresqlExtDatabase(config.DATABASE_NAME,
         user=config.DATABASE_USER, password=config.DATABASE_PASSWORD,
-        host=config.DATABASE_HOST, port=5432)
+        host=config.DATABASE_HOST, port=config.DATABASE_PORT)
 
 
 # --------------------------------------------------------------------------

@@ -23,8 +23,8 @@ for k, v in os.environ.items():
 # grand switch to production!
 IS_PRODUCTION = bool(srvconf['PYSRV_IS_PRODUCTION'] or False)
 
-# local dev is simply my mac
-IS_LOCAL_DEV = "darwin" in sys.platform and not IS_PRODUCTION
+# local dev flag
+IS_LOCAL_DEV = os.environ.get("FLASK_ENV") == "development" and not IS_PRODUCTION
 # IS_LOCAL_DEV = False
 
 print("\nCONFIG: prod={},localdev={} ({})\n".format(
@@ -32,6 +32,7 @@ print("\nCONFIG: prod={},localdev={} ({})\n".format(
 
 # database config
 DATABASE_HOST = srvconf['PYSRV_DATABASE_HOST']
+DATABASE_PORT = srvconf['PYSRV_DATABASE_PORT']
 DATABASE_NAME = srvconf['PYSRV_DATABASE_NAME']
 DATABASE_USER = srvconf['PYSRV_DATABASE_USER']
 DATABASE_PASSWORD = srvconf['PYSRV_DATABASE_PASSWORD']
@@ -49,7 +50,7 @@ flask_config = dict(
 
     # session config - hardcoded to Redis
     SESSION_TYPE = 'redis',
-    SESSION_REDIS = redis.from_url('redis://{}:6379'.format(redishost)),
+    SESSION_REDIS = redis.from_url('redis://{}'.format(redishost)),
     SESSION_COOKIE_NAME = "mycookie",
     SESSION_COOKIE_SECURE = srvconf['PYSRV_COOKIE_HTTPS_ONLY'] if not IS_LOCAL_DEV else False, # require https?
     SESSION_COOKIE_HTTPONLY = True, # don't allow JS cookie access
