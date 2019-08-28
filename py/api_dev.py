@@ -44,18 +44,22 @@ def list_api():
             url, url, methods, docs))
 
     header = """<body>
+        <title>RESTPie3</title>
         <style>
             body { width: 80%; margin: 20px auto;
                  font-family: Courier; }
             section { background: #eee; padding: 40px 20px;
                 border: 1px dashed #aaa; }
-        </style>
+        </style>"""
+    title = """
         <section>
-        <h2>REST API (_COUNT_ end-points)</h2>
-        """.replace('_COUNT_', str(len(apilist)))
+        <h2>REST API ({} end-points)</h2>
+        <h3>IS_PRODUCTION={}  IS_LOCAL_DEV={} Started ago={}</h3>
+        """.format(len(apilist), config.IS_PRODUCTION, config.IS_LOCAL_DEV,
+                config.started_ago(True))
     footer = "</section></body>"
 
-    return header + "<br/>".join(apilist) + footer
+    return header + title + "<br/>".join(apilist) + footer
 
 
 if config.IS_LOCAL_DEV:

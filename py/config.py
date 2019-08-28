@@ -10,6 +10,7 @@ import sys
 import os
 import redis
 import json
+import time
 
 # first load config from a json file,
 srvconf = json.load(open(os.environ["PYSRV_CONFIG_PATH"]))
@@ -64,4 +65,17 @@ PYSRV_LOG_SQL = srvconf.get('PYSRV_LOG_SQL')
 
 # allow API access to this domain
 CORS_ALLOW_ORIGIN = srvconf.get('PYSRV_CORS_ALLOW_ORIGIN', '*')
+
+START_TIME = int(time.time())
+
+
+def started_ago(as_string=False):
+    """Returns how many seconds ago the server was started. Or as a string."""
+
+    ago = int(time.time()) - START_TIME
+    if as_string:
+        return "{}d {:02d}:{:02d}:{:02d}".format(int(ago/60/60/24),
+                int(ago/60/60)%24, int(ago/60)%60, ago%60)
+    else:
+        return ago
 
