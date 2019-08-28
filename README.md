@@ -15,7 +15,8 @@ Open sourced on Sep 2018 after years of production use at multiple sites.
 * [Building blocks](#building-blocks)
 * [What about the front-end?](#what-about-the-front-end)
 * [Source files](#source-files)
-* [Setup local dev environment](#setup-local-dev-environment)
+* [Run locally with Docker](#run-locally-with-docker)
+* [Develop locally with Docker](#develop-locally-with-docker)
 * [API methods](#api-methods)
 * [Authentication & authorization](#authentication--authorization)
 * [Session data](#session-data)
@@ -23,8 +24,7 @@ Open sourced on Sep 2018 after years of production use at multiple sites.
 * [Background workers & cron](#background-workers--cron)
 * [Logging](#logging)
 * [Tests](#tests)
-* [Docker](#docker)
-* [Script deployment to VPS](#script-deployment-to-vps)
+* [Deploy to VPS](#deploy-to-vps)
 * [Setup VPS server](#setup-vps-server)
 * [Nginx](#nginx)
 * [Security](#security)
@@ -53,7 +53,7 @@ A quick list of the features of this Python API server:
   requests, warnings&errors colorized
 * Server reload on code change
 * Database migrations
-* Docker image for the "big cloud"
+* Docker image for the "big cloud" and local development
 * Fast rsync deployment of updates to VPS servers
 * Tests for the API
 
@@ -200,7 +200,7 @@ The whole of this server fits into a small set of files:
 ├── Dockerfile              # docker image config
 ├── fabfile.py              # automation tasks: rsync deploy, migrations
 ├── requirements.txt        # python 3rd party dependencies
-└── run.sh                  # run server locally in dev mode
+└── run.sh                  # run server locally with Docker in dev mode
 ```
 
 So how do you get started with your own project? I suggest to take this route:
@@ -217,81 +217,126 @@ So how do you get started with your own project? I suggest to take this route:
   * create tests
 
 
-Setup local dev environment
----------------------------
+Run locally with Docker
+-----------------------
 
-The server components run on all common OS. To start development on OSX
-machine, first install [Homebrew](https://brew.sh/). You also need to have
-XCode installed. (Read [Docker](#docker) if you want to take the Docker
-route.)
+The fastest and easiest way to test drive RESTPie3 on your machine is to use
+[Docker](https://www.docker.com/). The server fully supports Docker - the
+Docker image is created with this [Dockerfile](Dockerfile). The base image is
+a popular lightweight Alpine Linux with Python 3.7.
 
-Install the 2 external components PostgreSQL and Redis, their latest versions:
+If you already have Docker installed, the quick steps to run RESTPie3 plus its
+services Redis, PostgreSQL are:
 
-    brew install redis
-    brew install postgresql
+    # download latest redis version 5.x
+    docker pull redis:5
 
-Then start the 2 components:
+    # create + start the redis instance
+    docker run -d --name redis -p 63790:6379 redis:5
 
-    brew services start postgresql
-    redis-server /usr/local/etc/redis.conf
+    # download latest postgresql version 11.x
+    docker pull postgres:11
 
-Install Python3:
+    # create + start a postgres instance - use your own db + password!
+    # the params here must match the ones in conf/server-config.json
+    docker run -d --name pos-restpie -p 54320:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=MY_PASSWORD postgres:11
 
-    brew install python3
+    # activate the uuid extension
+    docker exec -it pos-restpie psql -U tm -d tmdb -c 'create extension "uuid-ossp"'
 
-Python virtualenv is a tool to create isolated Python environments for project
-dependencies.  Let's create and activate our environment:
-
-    pip install virtualenv
-    virtualenv --python=/usr/local/bin/python3 ~/PYSTARTERENV
-    source ~/PYSTARTERENV/bin/activate
-    export SERVER_VIRTUALENV=~/PYSTARTERENV/
-
-
-Redis does not require more setup. For PostgreSQL, create the database and
-the user: (pick your own names and secrets for the capital parts!)
-
-    createuser MY_USER
-    createdb -O tm MY_DATABASE
-    psql MY_DATABASE
-    alter user MY_USER with encrypted password 'MY_PASSWORD';
-    create extension if not exists "uuid-ossp";
-
-
-Download the sources to your local disk and install dependencies:
-
+    # build the RESTPie3 image
     git clone https://github.com/tomimick/restpie3
     cd restpie3
-    pip3 install -r requirements.txt
+    docker build -t restpie-image:0.0.1 .
 
-Then clone the [config template json](conf/server-config.json) into a file
-OUTSIDE the repository, and write your own PostgreSQL names and secrets from
-above in the config. (It is not a good practice to commit the secrets into a
-repository, so let's keep them in an external json file. Or alternatively you
-can store them in environment variables.)
+    # create + start RESTPie3
+    docker run --name restpie -d -p 8100:80 restpie-image:0.0.1
 
-    cp conf/server-config.json <MY_PATH>
-    pico <MY_PATH>/server-config.json
-    export PYSRV_CONFIG_PATH=<MY_PATH>/server-config.json
+    # create initial database schema in postgresql
+    docker exec -it restpie -e PYTHONPATH=/app/py -e PYSRV_CONFIG_PATH=/app/real-server-config.json python /app/scripts/dbmigrate.py
 
-Then initialize the database by executing the database migrations:
 
-    python3 scripts/dbmigrate.py
+If all went OK, RESTPie3 + Redis + PostgreSQL are running and you should be
+able to list the REST API at http://localhost:8100/api/list The database is
+empty at this point so empty lists are returned from the API. You are also
+logged out so some of the end-points can't be accessed. You can run the
+database unit tests XXX to put some data in the database.
 
-Finally start the python server!
+Note that I am using custom ports for Redis (63790) and PostgreSQL (54320), so
+that they are not mixed with official service ports and so that I can run
+multiple simultaneous instances at different ports, if necessary.
 
-    ./run.sh
+To start and stop these docker instances, invoke:
 
-If you had trouble with these steps, please first Google around as the setup
-steps may vary a little depending on OS type and component versions. Then you
-could post an issue to this repository, possibly with a solution that you
-found out.
+    docker start redis
+    docker start pos-restpie
+    docker start restpie
+    docker stop redis
+    docker stop pos-restpie
+    docker stop restpie
 
-If all went ok, the API site is available at localhost and you can see
-the list of available API methods at
-[localhost:8100/api/list](http://localhost:8100/api/list).
+If you don't want to use docker, you can install Redis, PostgreSQL, python3
+and the required python libs on your local machine too. On OSX,
+[Homebrew](https://brew.sh/) is a good installation tool. These steps are not
+documented here, but it's not that hard.
 
-Whenever you modify any of the Python files, the server reloads itself.
+
+Develop locally with Docker
+---------------------------
+
+Docker is great for packaging software to be run in the cloud, but it is also
+beneficial while developing the software. With Docker you can isolate and play
+easily with different dev environments and services without installing
+anything on the local machine and without facing ugly local version conflicts.
+Running the same docker image locally also ensures the environment is
+identical to the release environment, which makes a lot of sense.
+
+Here's how to run the same RESTPie3 image in dev mode:
+
+    # build a dev image
+    docker build --build-arg BUILDMODE=debug-docker -t restpie-dev-image .
+
+    # run the dev image - write your own local path here!
+    docker run --rm --name restpie-dev -p 8100:80 -v ~/Downloads/restpie3/py:/app/pylocal restpie-dev-image
+
+    # or alias for above docker run:
+    run.sh
+
+Then you should see the REST API list again at http://localhost:8100/api/list
+but this time in DEV mode: IS_LOCAL_DEV=True.
+
+The above command runs the dev instance in the foreground so you are able to
+see the logging output in the console and detect errors immediately. You can
+stop the server with CTRL+C.  When the instance ends, its data is deleted (the
+--rm option) - this is good as we don't want to create a long list of dangling
+temporary instances.
+
+Now the COOL thing in the dev mode here is that we are using Docker volumes to
+map a local `py` folder containing the python source files to `pylocal` folder
+inside the Docker instance. This makes it possible to use any local file
+editor to edit the python sources and when a file is saved, the server inside
+the Docker instance reloads itself automatically!
+
+To see the executed SQL statements of the server in the console, you can set
+the PYSRV_LOG_SQL env variable:
+
+    docker run --rm --name restpie-dev -p 8100:80 -v ~/Downloads/restpie3/py:/app/pylocal -e PYSRV_LOG_SQL=1 restpie-dev-image
+
+
+If you want to run a shell inside the dev instance, invoke in another terminal
+session, while dev instance is running:
+
+    docker exec -it restpie-dev /bin/sh
+
+    # see files in the instance file system
+    ls
+
+    # see running processes
+    top
+
+    # run python files
+    python scripts/something.py
+
 
 
 API methods
@@ -528,12 +573,8 @@ Requests that take more than 20 seconds get terminated and the following line
 is logged: `HARAKIRI ON WORKER 1 (pid: 47704, try: 1)`. This harakiri time is
 configurable.
 
-To log the executed SQL statements during development, you can execute:
-
-    # dump SQL
-    export PYSRV_LOG_SQL=1
-    # stop dumping SQL
-    export PYSRV_LOG_SQL=
+To log the executed SQL statements during development, see PYSRV_LOG_SQL
+above.
 
 Note that as the server logs may contain sensitive data, you should not keep
 the production logs for too long time, and you should mention in the policy
@@ -573,32 +614,8 @@ before running the API tests. If you like to write tests in a different way,
 just remove it.
 
 
-Docker
-------
-The server can be dockerized with the included [Dockerfile](Dockerfile). The
-base image is the popular lightweight Alpine Linux with the latest Python 3.7.
-
-Build the docker image:
-
-    docker build -t pysrv:0.0.1 .
-
-Run the docker image locally:
-
-    docker run -p 8100:80 pysrv:0.0.1
-
-The generated image size is 256MB. With some docker tricks it might be
-possible to reduce the build size further.
-
-If you use PostgreSQL and Redis that are installed in the localhost, the
-configured host for both should be `host.docker.internal`.
-
-If you plan to developed with Docker locally, and not with Python virtualenv,
-use volumes that map Linux folders to your host folders and enable uwsgi hot
-reload `py-autoreload=1` on code change.
-
-
-Script deployment to VPS
-------------------------
+Deploy to VPS
+-------------
 
 Even though the world is crazy about Docker, I still often like to deploy code
 directly and quickly to VPS servers, especially during project start and early
