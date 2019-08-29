@@ -11,7 +11,8 @@ import unittest
 import requests
 import json
 
-URL_BASE = "http://localhost:8100/api/"
+# URL_BASE = "http://localhost:8100/api/"
+URL_BASE = "http://localhost:80/api/" # port is 80 inside docker
 
 URL_SIGNUP     = 'signup'
 URL_LOGIN      = 'login'
