@@ -194,7 +194,7 @@ The whole of this server fits into a small set of files:
 ├── /templates/             # templates (if you really need them)
 │   └── /example.html       #   very basic jinja2 example
 ├── /test/                  # test scripts
-│   ├── /quick.sh           #   quick adhoc calls with httpie
+│   ├── /quick.sh           #   quick adhoc curl example
 │   ├── /test_api.py        #   test API methods
 │   ├── /test_redis.py      #   test redis module
 │   └── /sample.log.txt     #   sample logging output from api test
@@ -259,10 +259,14 @@ services Redis, PostgreSQL are:
 
 
 If all went OK, RESTPie3 + Redis + PostgreSQL are running and you should be
-able to list the REST API at http://localhost:8100/api/list The database is
-empty at this point so empty lists are returned from the API. You are also
-logged out so some of the end-points can't be accessed. You can run the
-database unit tests XXX to put some data in the database.
+able to list the REST API at http://localhost:8100/api/list
+
+The database is empty at this point so empty lists are returned from the API.
+You are also logged out so some of the API end-points can't be accessed. To
+quickly test the API, you can invoke this example script which uses curl to do
+a signup and insert a new movie in the database:
+
+    ./test/quick.sh
 
 Note that I am using custom ports for Redis (63790) and PostgreSQL (54320), so
 that they are not mixed with official service ports and so that I can run
