@@ -19,6 +19,7 @@ COPY migrations /app/migrations
 COPY scripts /app/scripts
 COPY templates /app/templates
 COPY test /app/test
+COPY conf/loginscript.sh /etc/profile
 
 # background spooler dir
 RUN mkdir /tmp/pysrv_spooler

@@ -54,7 +54,7 @@ A quick list of the features of this Python API server:
 * Server reload on code change
 * Database migrations
 * Docker image for the "big cloud" and local development
-* Fast rsync deployment of updates to VPS servers
+* Fast rsync deployment of updates to Linux VPS servers
 * Tests for the API
 
 
@@ -168,6 +168,7 @@ The whole of this server fits into a small set of files:
 ```
 ├── /conf/                  # configuration files
 │   ├── /favicon.ico        #   site icon
+│   ├── /loginscript.sh     #   docker shell login script, sets paths
 │   ├── /pydaemon.service   #   systemd daemon config (if you run in a VPS)
 │   ├── /robots.txt         #   deny all from robots
 │   ├── /server-config.json #   main server config: db, redis, etc
@@ -200,7 +201,8 @@ The whole of this server fits into a small set of files:
 ├── Dockerfile              # docker image config
 ├── fabfile.py              # automation tasks: rsync deploy, migrations
 ├── requirements.txt        # python 3rd party dependencies
-└── run.sh                  # run server locally with Docker in dev mode
+├── run.sh                  # run server locally with Docker in dev mode
+└── shell.sh                # run interactive shell inside docker instance
 ```
 
 So how do you get started with your own project? I suggest to take this route:
@@ -253,7 +255,7 @@ services Redis, PostgreSQL are:
     docker run --name restpie -d -p 8100:80 restpie-image:0.0.1
 
     # create initial database schema in postgresql
-    docker exec -it restpie -e PYTHONPATH=/app/py -e PYSRV_CONFIG_PATH=/app/real-server-config.json python /app/scripts/dbmigrate.py
+    docker exec -it restpie /bin/ash -l -c 'python /app/scripts/dbmigrate.py'
 
 
 If all went OK, RESTPie3 + Redis + PostgreSQL are running and you should be
@@ -299,8 +301,8 @@ Here's how to run the same RESTPie3 image in dev mode:
     # run the dev image - write your own local path here!
     docker run --rm --name restpie-dev -p 8100:80 -v ~/Downloads/restpie3/py:/app/pylocal restpie-dev-image
 
-    # or alias for above docker run:
-    run.sh
+    # or alias for the above docker run
+    ./run.sh
 
 Then you should see the REST API list again at http://localhost:8100/api/list
 but this time in DEV mode: IS_LOCAL_DEV=True.
@@ -326,10 +328,14 @@ the PYSRV_LOG_SQL env variable:
 If you want to run a shell inside the dev instance, invoke in another terminal
 session, while dev instance is running:
 
-    docker exec -it restpie-dev /bin/sh
+    docker exec -it restpie-dev /bin/ash -l
+
+    # or just
+    ./shell.sh
 
     # see files in the instance file system
     ls
+    ll
 
     # see running processes
     top
@@ -613,6 +619,17 @@ For locally run tests I expose a method `/apitest/dbtruncate` in
 before running the API tests. If you like to write tests in a different way,
 just remove it.
 
+Run tests inside the DEV instance:
+
+    docker exec -it restpie-dev /bin/ash -l -c 'python /app/test/test_api.py'
+    docker exec -it restpie-dev /bin/ash -l -c 'python /app/test/test_redis.py'
+
+
+Deploy to Linux server running Docker
+-------------------------------------
+
+To be written. Docker compose, rsync+reload script etc.
+
 
 Deploy to VPS
 -------------
@@ -664,8 +681,14 @@ Install PostgreSQL and Redis at server:
     sudo apt-get install python3-pip
     mkdir /app/
 
-Then configure PostgreSQL at server in a similar way as explained for a local
-setup [above](#setup-local-dev-environment).
+Redis does not require more setup. For PostgreSQL, create the database and
+the user: (pick your own names and secrets for the capital parts!)
+
+    createuser MY_USER
+    createdb -O tm MY_DATABASE
+    psql MY_DATABASE
+    alter user MY_USER with encrypted password 'MY_PASSWORD';
+    create extension if not exists "uuid-ossp";
 
 Write the IP-address or server name locally in your fabfile.py as
 TEST_SERVER. Plus add your SSH credentials and a path to your public key.
