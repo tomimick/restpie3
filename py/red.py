@@ -24,8 +24,8 @@ import logging
 log = logging.getLogger("cache")
 
 
-rdb = redis.StrictRedis(host=config.redishost)
-
+#rdb = redis.StrictRedis(host=config.redishost)
+rdb = redis.from_url('redis://{}'.format(config.redishost))
 
 # --------------------------------------------------------------------------
 # key values
