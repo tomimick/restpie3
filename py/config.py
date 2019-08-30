@@ -57,7 +57,7 @@ flask_config = dict(
     SESSION_COOKIE_HTTPONLY = True, # don't allow JS cookie access
     SESSION_KEY_PREFIX = 'pysrv',
     PERMANENT_SESSION_LIFETIME = 60*60*24*30, # 1 month
-    SESSION_COOKIE_DOMAIN = srvconf['PYSRV_DOMAIN_NAME'] if not IS_LOCAL_DEV else None,
+    SESSION_COOKIE_DOMAIN = srvconf['PYSRV_DOMAIN_NAME'] or None if not IS_LOCAL_DEV else None,
 )
 
 # dump sql statements in log file?

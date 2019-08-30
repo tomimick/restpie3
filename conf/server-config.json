@@ -11,7 +11,7 @@
 
     "PYSRV_COOKIE_HTTPS_ONLY": false,
     "PYSRV_REDIS_HOST": "host.docker.internal:63790",
-    "PYSRV_DOMAIN_NAME": "mydomain.com",
+    "PYSRV_DOMAIN_NAME": "",
     "PYSRV_CORS_ALLOW_ORIGIN": "*"
 }
 
