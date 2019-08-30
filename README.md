@@ -224,8 +224,11 @@ Run locally with Docker
 
 The fastest and easiest way to test drive RESTPie3 on your machine is to use
 [Docker](https://www.docker.com/). The server fully supports Docker - the
-Docker image is created with this [Dockerfile](Dockerfile). The base image is
-a popular lightweight Alpine Linux with Python 3.7.
+Docker image is created with this [Dockerfile](Dockerfile).
+
+The base image is an [official python image](https://hub.docker.com/_/python)
+variant **python:3.7-slim-buster**, a recent and small Debian as of
+August 2019. The generated image size is 216MB, 76MB gzipped.
 
 If you already have Docker installed, the quick steps to run RESTPie3 plus its
 services Redis, PostgreSQL are:
@@ -255,7 +258,7 @@ services Redis, PostgreSQL are:
     docker run --name restpie -d -p 8100:80 restpie-image:0.0.1
 
     # create initial database schema in postgresql
-    docker exec -it restpie /bin/ash -l -c 'python /app/scripts/dbmigrate.py'
+    docker exec -it restpie bash -l -c 'python /app/scripts/dbmigrate.py'
 
 
 If all went OK, RESTPie3 + Redis + PostgreSQL are running and you should be
@@ -303,7 +306,7 @@ Here's how to run the same RESTPie3 image in dev mode:
     docker build --build-arg BUILDMODE=debug-docker -t restpie-dev-image .
 
     # run the dev image - write your own local path here!
-    docker run --rm --name restpie-dev -p 8100:80 -v ~/Downloads/restpie3/py:/app/pylocal restpie-dev-image
+    docker run -it --rm --name restpie-dev -p 8100:80 -v ~/Downloads/restpie3/py:/app/pylocal restpie-dev-image
 
     # or alias for the above docker run
     ./run.sh
@@ -332,7 +335,7 @@ the PYSRV_LOG_SQL env variable:
 If you want to run a shell inside the dev instance, invoke in another terminal
 session, while dev instance is running:
 
-    docker exec -it restpie-dev /bin/ash -l
+    docker exec -it restpie-dev bash -l
 
     # or just
     ./shell.sh
@@ -342,11 +345,13 @@ session, while dev instance is running:
     ll
 
     # see running processes
-    top
+    htop
 
     # run python files
     python scripts/something.py
 
+You can modify the [login script](conf/loginscript.sh) to set paths and
+aliases etc for this interactive shell.
 
 
 API methods
@@ -625,8 +630,8 @@ just remove it.
 
 Run tests inside the DEV instance:
 
-    docker exec -it restpie-dev /bin/ash -l -c 'python /app/test/test_api.py'
-    docker exec -it restpie-dev /bin/ash -l -c 'python /app/test/test_redis.py'
+    docker exec -it restpie-dev bash -l -c 'python /app/test/test_api.py'
+    docker exec -it restpie-dev bash -l -c 'python /app/test/test_redis.py'
 
 
 Deploy to Linux server running Docker

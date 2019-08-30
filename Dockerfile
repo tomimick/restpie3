@@ -1,16 +1,30 @@
-FROM python:3.7-alpine3.8
+FROM python:3.7-slim-buster
 
 WORKDIR /app
 
-# add dependencies, use --virtual deps for build time modules only,
-# then remove to reduce image size
-COPY requirements.txt /app/requirements.txt
-RUN apk update && apk add --virtual deps gcc linux-headers musl-dev postgresql-dev libffi-dev make
-RUN pip install -r /app/requirements.txt
-RUN apk del deps
+# uwsgi must be compiled - install necessary build tools, compile uwsgi
+# and then remove the build tools to minimize image size
+# (buildDeps are removed, deps are kept)
+RUN set -ex \
+    && buildDeps=' \
+        build-essential \
+    ' \
+    && deps=' \
+        htop \
+    ' \
+    && apt-get update && apt-get install -y $buildDeps $deps --no-install-recommends  && rm -rf /var/lib/apt/lists/* \
+    && pip install uWSGI==2.0.18 \
+    && apt-get purge -y --auto-remove $buildDeps \
+    && find /usr/local -depth \
+    \( \
+        \( -type d -a -name test -o -name tests \) \
+        -o \
+        \( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
+    \) -exec rm -rf '{}' +
 
-# this postgresql lib is needed
-RUN apk add --no-cache libpq
+# install other py libs - not require compilation
+COPY requirements.txt /app/requirements.txt
+RUN pip install -r /app/requirements.txt
 
 # copy source files
 COPY conf /app/conf

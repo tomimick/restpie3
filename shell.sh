@@ -1,4 +1,5 @@
 #!/bin/sh
 # run interactive shell inside docker instance
 
-docker exec -it restpie-dev /bin/ash -l
+docker exec -it restpie-dev bash -l
+

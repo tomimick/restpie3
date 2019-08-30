@@ -1,12 +1,10 @@
-Fabric3==1.14.post1
-Flask==1.0.2
+Flask==1.0.4
 Flask-Session==0.3.1
 passlib==1.7.1
-peewee==3.8.0
-peewee-migrate==1.1.4
-psycopg2-binary==2.7.6.1
+peewee==3.8.2
+peewee-migrate==1.1.6
+psycopg2-binary==2.8.3
 pytz==2018.7
-redis==3.0.1
-requests==2.21
-uWSGI==2.0.17.1
+redis==3.3.8
+requests==2.22
 
