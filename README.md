@@ -748,6 +748,9 @@ other destinations, like to Node and file system:
 
         # static files
         location /static/ {
+            root /path/to/myfiles;
+            # note that you must have /path/to/myfiles/static/ folder,
+            # unless rewriting the url
             try_files $uri /index.html =404;
         }
 
