@@ -26,9 +26,9 @@ def list_api():
     methods directly from Flask, no need to maintain separate API doc.
     (Maybe this could be used as a start to generate Swagger API spec too.)"""
 
-    # not available in production
-    if config.IS_PRODUCTION:
-        abort(400)
+    # decide whether available in production
+#     if config.IS_PRODUCTION:
+#         return "not available in production", 400
 
     # build HTML of the method list
     apilist = []
