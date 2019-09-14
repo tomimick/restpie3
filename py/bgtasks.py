@@ -14,6 +14,7 @@ import util
 import webutil
 import config
 import time
+import uwsgi
 
 import logging
 log = logging.getLogger("bgtasks")
@@ -25,11 +26,19 @@ def send_email(*args, **kwargs):
 
     log.info("send_email started, got arguments: {} {}".format(args, kwargs))
 
+    try:
+        log.info("processing emails...")
 
-    log.info("processing emails...")
+        # do the stuff...
+        time.sleep(3)
 
-    # do the stuff...
-    time.sleep(3)
+        log.info("processing done!")
 
-    log.info("processing done!")
+    except:
+        log.exception("send_email")
+
+        # returning SPOOL_OK here signals to uwsgi to not retry this task
+        # if the exception propagates up, uwsgi will call us again in
+        # N secs, configured in uwsgi.ini: spooler-frequency
+        return uwsgi.SPOOL_OK
 
