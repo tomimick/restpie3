@@ -14,6 +14,10 @@ http://docs.peewee-orm.com/en/latest/peewee/playhouse.html#postgres-ext
 from peewee import *
 from playhouse.shortcuts import model_to_dict
 from playhouse.postgres_ext import PostgresqlExtDatabase, ArrayField, BinaryJSONField, BooleanField, JSONField
+# support for arrays of uuid
+import psycopg2.extras
+psycopg2.extras.register_uuid()
+
 from flask import abort
 import config
 
