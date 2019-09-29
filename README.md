@@ -688,11 +688,13 @@ Install PostgreSQL and Redis at server:
     sudo apt-get install redis-server
     sudo apt-get install postgresql
     sudo apt-get install python3-pip
+    sudo apt-get install rsync (on Debian)
     mkdir /app/
 
 Redis does not require more setup. For PostgreSQL, create the database and
 the user: (pick your own names and secrets for the capital parts!)
 
+    sudo su - postgres
     createuser MY_USER
     createdb -O tm MY_DATABASE
     psql MY_DATABASE
