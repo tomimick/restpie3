@@ -123,9 +123,15 @@ def get_user_by_email(email):
 
     if not email:
         return None
+
     try:
-        return User.select().where(User.email == email).get()
-    except User.DoesNotExist:
+#         return User.select().where(User.email == email).get()
+        # case insensitive query
+        sql = "SELECT * FROM users where LOWER(email) = LOWER(%s) LIMIT 1"
+        args = (email,)
+        return list(User.raw(sql, args))[0]
+
+    except:
         return None
 
 
