@@ -255,7 +255,7 @@ services Redis, PostgreSQL are:
     docker build -t restpie-image:0.0.1 .
 
     # create + start RESTPie3
-    docker run --name restpie -d -p 8100:80 restpie-image:0.0.1
+    docker run --name restpie --add-host=host.docker.internal:$(ip route | grep docker0 | awk '{print $9}') -d -p 8100:80 restpie-image:0.0.1
 
     # create initial database schema in postgresql
     docker exec -it restpie bash -l -c 'python /app/scripts/dbmigrate.py'
