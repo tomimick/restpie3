@@ -88,7 +88,10 @@ def before_request():
        prepares global data, loads current user."""
 
     # log request path+input, but not secrets
-    params = request.json or request.args or request.form
+    try:
+        params = request.json or request.args or request.form
+    except:
+        params = None
     if params:
         cloned = None
         secret_keys = ["password", "passwd", "pwd"]
