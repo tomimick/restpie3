@@ -30,6 +30,7 @@ RUN pip install -r /app/requirements.txt
 COPY conf /app/conf
 COPY py /app/py
 COPY migrations /app/migrations
+COPY migrations_sqlite /app/migrations_sqlite
 COPY scripts /app/scripts
 COPY templates /app/templates
 COPY test /app/test

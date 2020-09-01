@@ -4,6 +4,7 @@
     "PYSRV_IS_PRODUCTION": "",
 
     "PYSRV_DATABASE_HOST": "host.docker.internal",
+    "PYSRV_DATABASE_HOST_SQLITE": "/app/data/mydb.sqlite",
     "PYSRV_DATABASE_PORT": "54320",
     "PYSRV_DATABASE_NAME": "tmdb",
     "PYSRV_DATABASE_USER": "tm",

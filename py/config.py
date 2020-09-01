@@ -37,7 +37,7 @@ DATABASE_PORT = srvconf['PYSRV_DATABASE_PORT']
 DATABASE_NAME = srvconf['PYSRV_DATABASE_NAME']
 DATABASE_USER = srvconf['PYSRV_DATABASE_USER']
 DATABASE_PASSWORD = srvconf['PYSRV_DATABASE_PASSWORD']
-
+IS_SQLITE = DATABASE_HOST.startswith("/")
 
 # Flask + session config
 # http://flask.pocoo.org/docs/1.0/config/

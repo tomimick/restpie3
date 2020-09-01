@@ -2,12 +2,14 @@
 RESTPie3 - Python REST API Server Starter Kit
 =============================================
 
-This is a lightweight REST API server implemented in Python3 offering
+This is a lightweight REST API server implemented in Python3 that offers
 essential web service features in a simple package. This is not a framework,
-just a practical and clean codebase that relies on few core components that do
-the job well. Fork and create your own REST API server quickly.
+just **a practical and clean codebase that relies on a few core components**
+that do the job well. Fork and create your own REST API server quickly.
 
 Open sourced on Sep 2018 after years of production use at multiple sites.
+
+Update Sep 2020: Run in Raspberry with an SQLite database.
 
 **Table of contents**
 
@@ -29,6 +31,7 @@ Open sourced on Sep 2018 after years of production use at multiple sites.
 * [Nginx](#nginx)
 * [Security](#security)
 * [Scaling up](#scaling-up)
+* [Run in Raspberry](#run-in-raspberry)
 * [Need help?](#need-help)
 * [License](#license)
 * [Screenshot](#screenshot)
@@ -52,10 +55,12 @@ A quick list of the features of this Python API server:
 * Logging system with practical data for troubleshooting, detects slow
   requests, warnings&errors colorized
 * Server reload on code change
-* Database migrations
+* Database ORM and migrations
+* Database init schemas for PostgreSQL and SQLite
 * Docker image for the "big cloud" and local development
 * Fast rsync deployment of updates to Linux VPS servers
 * Tests for the API
+* Raspberry compatible
 
 
 Building blocks
@@ -100,6 +105,12 @@ I have years of experience of.
   the JSON functionality the most, since it provides good amount of
   flexibility to the relational model that I still prefer in a master database
   over the schema-free solutions.
+
+  Someone wrote an article saying [PostgreSQL is the worlds' best database](https://www.2ndquadrant.com/en/blog/postgresql-is-the-worlds-best-database/).
+
+  Note that the code also supports [SQLite](https://www.sqlite.org/index.html)
+  database. SQLite maybe convenient in a lighter setup if the full power of
+  PostgreSQL is not needed such as in a Raspberry.
 
 * [Redis](https://redis.io/) is a persistent in-memory database that is used
   as a storage for server-side session data and as a lightweight caching and
@@ -173,8 +184,11 @@ The whole of this server fits into a small set of files:
 │   ├── /robots.txt         #   deny all from robots
 │   ├── /server-config.json #   main server config: db, redis, etc
 │   └── /uwsgi.ini          #   uwsgi daemon config, for localdev & server
-├── /migrations/            # db migrations, schema changes
+├── /migrations/            # db migrations - postgresql
 │   ├── /001_users.py       #   users table, the foundation
+│   └── /002_movies.py      #   movies table, just as an example
+├── /migrations_sqlite/     # db migrations - sqlite
+│   ├── /001_init.py        #   users table, the foundation
 │   └── /002_movies.py      #   movies table, just as an example
 ├── /py/                    # python modules
 │   ├── /account.py         #   account related: passwords, user session
@@ -198,9 +212,11 @@ The whole of this server fits into a small set of files:
 │   ├── /test_api.py        #   test API methods
 │   ├── /test_redis.py      #   test redis module
 │   └── /sample.log.txt     #   sample logging output from api test
+├── build.sh                # build Docker image in dev mode
 ├── Dockerfile              # docker image config
 ├── fabfile.py              # automation tasks: rsync deploy, migrations
 ├── requirements.txt        # python 3rd party dependencies
+├── rsync.sh                # rsync sources to server and reload (instead of fabfile)
 ├── run.sh                  # run server locally with Docker in dev mode
 └── shell.sh                # run interactive shell inside docker instance
 ```
@@ -304,11 +320,12 @@ Here's how to run the same RESTPie3 image in dev mode:
 
     # build a dev image
     docker build --build-arg BUILDMODE=debug-docker -t restpie-dev-image .
+    # or just
+    ./build.sh
 
-    # run the dev image - write your own local path here!
-    docker run -it --rm --name restpie-dev -p 8100:80 -v ~/Downloads/restpie3/py:/app/pylocal restpie-dev-image
-
-    # or alias for the above docker run
+    # run the dev image
+    docker run -it --rm --name restpie-dev -p 8100:80 -v `pwd`/py:/app/pylocal restpie-dev-image
+    # or just
     ./run.sh
 
 Then you should see the REST API list again at http://localhost:8100/api/list
@@ -329,7 +346,7 @@ the Docker instance reloads itself automatically!
 To see the executed SQL statements of the server in the console, you can set
 the PYSRV_LOG_SQL env variable:
 
-    docker run --rm --name restpie-dev -p 8100:80 -v ~/Downloads/restpie3/py:/app/pylocal -e PYSRV_LOG_SQL=1 restpie-dev-image
+    docker run --rm --name restpie-dev -p 8100:80 -v `pwd`/py:/app/pylocal -e PYSRV_LOG_SQL=1 restpie-dev-image
 
 
 If you want to run a shell inside the dev instance, invoke in another terminal
@@ -668,6 +685,8 @@ This transfers only the changed source files from localhost to a server,
 performs database migrations and restarts the Python server. All in just
 4 seconds. This makes the core dev/test loop really fast.
 
+You can also ignore fabfile.py and just run ./rsync.sh.
+
 In any case, this is just an optional script. If you have a big environment,
 you most likely have a Continous Integration / Deployment solution in place.
 
@@ -831,6 +850,72 @@ scale horizontally. The core API server component can be cloned into a cluster
 of servers where each of them operates independently of the others. Scaling
 the API server here is easy, it is the other factors that become harder, like
 database scaling and infra management.
+
+
+Run in Raspberry
+----------------
+
+RESTPIe3 runs fine in Raspberry. RESTPIe3 is lightweight, does not consume
+much resources, and supports robust daemon and worker management that is
+important in a setup that may have more hiccups such as power outages or
+connectivity issues.
+
+In a Raspberry setup there usually is less need for a big database. Hence
+RESTPie3 also supports SQLite which is a small but solid zero configuration
+SQL database.
+
+To activate SQLite mode, configure server-config.json like this:
+
+    "PYSRV_DATABASE_HOST": "/app/data/mydb.sqlite",
+
+Then follow steps in "Run and Develop locally with Docker". Invoke ./run.sh.
+Then initialize SQLite database inside the container, from another terminal:
+
+    docker exec -it restpie bash -l -c 'python /app/scripts/dbmigrate.py'
+
+The SQLite database file will be created into RESTPIE3/data/mydb.sqlite. Note
+that this file is outside the container, accessed via volume so the file is
+not destroyed when the image is destroyed.
+
+Local container should now run with SQLite database.
+
+**Setup Raspberry**
+
+The setup steps for Raspberry are similar as with any Linux host. Here's the
+steps in short. I assume you already have a working SSH connection to
+Raspberry with pubkey configured.
+
+    # in raspberry:
+    sudo apt-get update
+    sudo apt-get install redis-server
+    sudo apt-get install python3-pip
+    sudo mkdir /app/
+
+    # in local machine (after ssh with pubkey is setup):
+    pico rsync.sh # write your own HOST
+    # then transfer files to raspberry /app/
+    ./rsync.sh
+
+    # in raspberry:
+    pico /app/requirements.txt # remove psycopg2-binary
+    sudo pip3 install -r /app/requirements.txt
+    sudo pip3 install uwsgi
+    cd /app/
+    cp conf/server-config.json real-server-config.json
+    # init sqlite database
+    python3 scripts/dbmigrate.py
+    # copy /app/data/mydb.sqlite into outside /app for safety (files under /app can be overridden in rsync)
+    pico /app/real-server-config.json # write location into PYSRV_DATABASE_HOST
+    # setup daemon
+    sudo cp conf/pydaemon.service /etc/systemd/system/
+    sudo systemctl enable pydaemon
+    sudo systemctl daemon-reload
+    sudo systemctl start pydaemon
+
+    # start dev in local machine:
+    # edit sources, then rsync...
+    ./rsync.sh
+    # server reloads itself automatically
 
 
 Need help?
