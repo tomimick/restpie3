@@ -1,10 +1,10 @@
-Flask==1.0.4
-Flask-Session==0.3.1
-passlib==1.7.1
-peewee==3.8.2
+Flask==1.1.2
+Flask-Session==0.3.2
+passlib==1.7.2
+peewee==3.13.3
 peewee-migrate==1.1.6
-psycopg2-binary==2.8.3
-pytz==2018.7
-redis==3.3.8
-requests==2.22
+psycopg2-binary==2.8.5
+pytz==2020.1
+redis==3.5.3
+requests==2.24
 
