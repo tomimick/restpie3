@@ -24,6 +24,7 @@ Update Sep 2020: Run in Raspberry with an SQLite database.
 * [Session data](#session-data)
 * [Redis storage](#redis-storage)
 * [Background workers & cron](#background-workers--cron)
+* [Mules: extra servers](#mules)
 * [Logging](#logging)
 * [Tests](#tests)
 * [Deploy to VPS](#deploy-to-vps)
@@ -546,7 +547,8 @@ Background workers & cron
 uwsgi provides a simple mechanism to run long running tasks in background
 worker processes.
 
-In any Python module (like in [bgtasks.py](py/bgtasks.py)) you have this code:
+In any Python module (like in [bgtasks.py](py/bgtasks.py)) you have code
+to be run in a background worker:
 
 ```python
     @spool(pass_arguments=True)
@@ -577,6 +579,33 @@ have a nightly task you simple code:
         """Runs every night at 2:00AM."""
         #...code here...
 ```
+
+Mules
+-----
+
+Mules are independent background worker processes/servers that start and stop
+along with the main API server.
+
+The benefit of mules is ease of setup and ease of sharing code and
+environment. You can develop extra servers with little effort - uwsgi manages
+the config and lifetimes of mules. If a mule exits for some reason, it is
+automatically restarted by uwsgi. (It is also possible to communicate between
+mules - read more [in the
+docs](https://uwsgi-docs.readthedocs.io/en/latest/Mules.html)).
+
+In the included toy example [mule1.py](py/mule1.py) a TCP server is created
+that listens on port 9999 and echoes back whatever it receives from TCP
+clients. You can test it by sending data to it with netcat-tool like this:
+
+    echo "hello world" | nc 192.168.100.10 9999
+
+
+You can have any number of different mules, each running in their own process.
+They are configured in [uwsgi.ini](conf/uwsgi.ini):
+
+    mule = py/mule1.py
+    mule = py/mule2.py
+
 
 
 Logging
@@ -855,7 +884,7 @@ database scaling and infra management.
 Run in Raspberry
 ----------------
 
-RESTPIe3 runs fine in Raspberry. RESTPIe3 is lightweight, does not consume
+RESTPie3 runs fine in Raspberry. RESTPie3 is lightweight, does not consume
 much resources, and supports robust daemon and worker management that is
 important in a setup that may have more hiccups such as power outages or
 connectivity issues.
@@ -871,9 +900,9 @@ To activate SQLite mode, configure server-config.json like this:
 Then follow steps in "Run and Develop locally with Docker". Invoke ./run.sh.
 Then initialize SQLite database inside the container, from another terminal:
 
-    docker exec -it restpie bash -l -c 'python /app/scripts/dbmigrate.py'
+    docker exec -it restpie-dev bash -l -c 'python3 /app/scripts/dbmigrate.py'
 
-The SQLite database file will be created into RESTPIE3/data/mydb.sqlite. Note
+The SQLite database file will be created into RESTPiE3/data/mydb.sqlite. Note
 that this file is outside the container, accessed via volume so the file is
 not destroyed when the image is destroyed.
 
@@ -885,6 +914,7 @@ The setup steps for Raspberry are similar as with any Linux host. Here's the
 steps in short. I assume you already have a working SSH connection to
 Raspberry with pubkey configured.
 
+```console
     # in raspberry:
     sudo apt-get update
     sudo apt-get install redis-server
@@ -905,17 +935,19 @@ Raspberry with pubkey configured.
     # init sqlite database
     python3 scripts/dbmigrate.py
     # copy /app/data/mydb.sqlite into outside /app for safety (files under /app can be overridden in rsync)
-    pico /app/real-server-config.json # write location into PYSRV_DATABASE_HOST
-    # setup daemon
+    pico /app/real-server-config.json # write db location into PYSRV_DATABASE_HOST, change PYSRV_REDIS_HOST to "localhost:6379"
+
+    # setup server as a service, to start on reboot
     sudo cp conf/pydaemon.service /etc/systemd/system/
     sudo systemctl enable pydaemon
     sudo systemctl daemon-reload
     sudo systemctl start pydaemon
 
-    # start dev in local machine:
+    # in local machine:
     # edit sources, then rsync...
     ./rsync.sh
     # server reloads itself automatically
+```
 
 
 Need help?
