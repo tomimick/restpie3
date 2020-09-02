@@ -147,8 +147,8 @@ def get_user_by_email(email):
 def query_users(page=0, limit=1000, search=None):
     """Return list of users. Desc order"""
 
-    page = int(page)
-    limit = int(limit)
+    page = int(page or 0)
+    limit = int(limit or 1000)
 
     q = User.select()
     if search:
