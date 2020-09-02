@@ -6,7 +6,7 @@
 #
 # Author: Tomi.Mickelsson@iki.fi
 
-from flask import jsonify, abort, render_template
+from flask import jsonify, redirect, render_template
 import datetime
 import html
 
@@ -18,6 +18,12 @@ from webutil import app
 
 import logging
 log = logging.getLogger("api")
+
+
+@app.route('/', methods = ['GET'])
+def index():
+    """Just a redirect to api list."""
+    return redirect('/api/list')
 
 
 @app.route('/api/list', methods = ['GET'])
@@ -40,6 +46,8 @@ def list_api():
         # remove noisy OPTIONS
         methods = sorted([x for x in rule.methods if x != "OPTIONS"])
         url = html.escape(str(rule))
+        if not "/api/" in url:
+            continue
         apilist.append("<div><a href='{}'><b>{}</b></a> {}<br/>{}</div>".format(
             url, url, methods, docs))
 
