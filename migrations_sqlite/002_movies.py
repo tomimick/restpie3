@@ -3,7 +3,8 @@
 def migrate(migrator, database, fake=False, **kwargs):
 
     migrator.sql("""CREATE TABLE movies(
-        id serial PRIMARY KEY,
+        id INTEGER PRIMARY KEY,
+
         created timestamp not null default CURRENT_TIMESTAMP,
         modified timestamp not null default CURRENT_TIMESTAMP,
 
