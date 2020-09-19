@@ -2,7 +2,7 @@
 RESTPie3 - Python REST API Server Starter Kit
 =============================================
 
-This is a lightweight REST API server implemented in Python3 that offers
+This is a lightweight python3 REST API server that offers
 essential web service features in a simple package. This is not a framework,
 just **a practical and clean codebase that relies on a few core components**
 that do the job well. Fork and create your own REST API server quickly.
@@ -15,7 +15,6 @@ Update Sep 2020: Run in Raspberry with an SQLite database.
 
 * [Features](#features)
 * [Building blocks](#building-blocks)
-* [What about the front-end?](#what-about-the-front-end)
 * [Source files](#source-files)
 * [Run locally with Docker](#run-locally-with-docker)
 * [Develop locally with Docker](#develop-locally-with-docker)
@@ -33,6 +32,7 @@ Update Sep 2020: Run in Raspberry with an SQLite database.
 * [Security](#security)
 * [Scaling up](#scaling-up)
 * [Run in Raspberry](#run-in-raspberry)
+* [What about the front-end?](#what-about-the-front-end)
 * [Need help?](#need-help)
 * [License](#license)
 * [Screenshot](#screenshot)
@@ -98,7 +98,8 @@ I have years of experience of.
   that runs and supervises the Python worker processes. uwsgi has a list of
   power features that are essential to a robust back-end: timecapped requests,
   recycling of workers, background tasks, cron jobs, timers, logging, auto
-  reloads on code change, run-as privileges.
+  reloads on code change, run-as privileges. uwsgi is configured via the
+  [uwsgi.ini](conf/uwsgi.ini) file.
 
 * [PostgreSQL](http://postgresql.org) is the main database, "the most advanced
   open source database" that is getting stronger every year. PostgreSQL is a
@@ -135,41 +136,6 @@ I have years of experience of.
 
 If you'd like to replace some of these components, it is possible, this is a
 small codebase.
-
-
-What about the front-end?
--------------------------
-
-This is primarily a back-end Python server that provides a REST API to the
-world. There is no front-end implementation in this project. This is because
-the focus is on creating a good REST API server that serves web front-ends and
-native mobile apps, but also because I think that it is good to modularize the
-front-end and back-end code cleanly into separate code bases.
-
-A web front-end in 2018 can be a big project with gazillion of Javascript
-libraries and tools. It is better to clearly separate the front and back parts
-from each other.  This can also make it easier to divide the work among
-in-house/outsourced teams.
-
-However, nothing stops you from implementing the front-end in this server
-project if you want to have all the code in a single place. And if you only
-need a few server generated HTML pages, you can take a look of included
-[example.html](templates/example.html).
-
-If you want inspiration of how to develop a modern web front-end that consumes
-a REST API, take a look of my two open-source starter kits:
-
-* [React/Nextjs starter](https://github.com/tomimick/tm-nextjs-starter)
-* [Vue/Nuxtjs starter](https://github.com/tomimick/tm-nuxtjs-starter)
-
-React and Vue are currently the most popular Javascript frameworks to create
-front-ends, followed by Angular which is a bit heavier, suited for bigger
-bisness apps.
-
-The two front-end starters and this server handle movie data as an example. You
-can connect the front-ends to this server but first you need to allow
-visitor access for the API methods in `api_movies.py` as the front-ends do not
-implement a login.
 
 
 Source files
@@ -948,6 +914,41 @@ Raspberry with pubkey configured.
     ./rsync.sh
     # server reloads itself automatically
 ```
+
+
+What about the front-end?
+-------------------------
+
+This is primarily a back-end Python server that provides a REST API to the
+world. There is no front-end implementation in this project. This is because
+the focus is on creating a good REST API server that serves web front-ends and
+native mobile apps, but also because I think that it is good to modularize the
+front-end and back-end code cleanly into separate code bases.
+
+A web front-end in 2018 can be a big project with gazillion of Javascript
+libraries and tools. It is better to clearly separate the front and back parts
+from each other.  This can also make it easier to divide the work among
+in-house/outsourced teams.
+
+However, nothing stops you from implementing the front-end in this server
+project if you want to have all the code in a single place. And if you only
+need a few server generated HTML pages, you can take a look of included
+[example.html](templates/example.html).
+
+If you want inspiration of how to develop a modern web front-end that consumes
+a REST API, take a look of my two open-source starter kits:
+
+* [React/Nextjs starter](https://github.com/tomimick/tm-nextjs-starter)
+* [Vue/Nuxtjs starter](https://github.com/tomimick/tm-nuxtjs-starter)
+
+React and Vue are currently the most popular Javascript frameworks to create
+front-ends, followed by Angular which is a bit heavier, suited for bigger
+bisness apps.
+
+The two front-end starters and this server handle movie data as an example. You
+can connect the front-ends to this server but first you need to allow
+visitor access for the API methods in `api_movies.py` as the front-ends do not
+implement a login.
 
 
 Need help?
