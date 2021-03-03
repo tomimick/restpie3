@@ -3,7 +3,8 @@
 
     "PYSRV_IS_PRODUCTION": "",
 
-    "PYSRV_DATABASE_HOST": "host.docker.internal",
+    "PYSRV_DATABASE_HOST": "/app/data/mydb.sqlite",
+    "PYSRV_DATABASE_HOST_POSTGRESQL": "host.docker.internal",
     "PYSRV_DATABASE_HOST_SQLITE": "/app/data/mydb.sqlite",
     "PYSRV_DATABASE_PORT": "54320",
     "PYSRV_DATABASE_NAME": "tmdb",
@@ -11,7 +12,7 @@
     "PYSRV_DATABASE_PASSWORD": "MY_PASSWORD",
 
     "PYSRV_COOKIE_HTTPS_ONLY": false,
-    "PYSRV_REDIS_HOST": "host.docker.internal:63790",
+    "PYSRV_REDIS_HOST": "host.docker.internal:6379",
     "PYSRV_DOMAIN_NAME": "",
     "PYSRV_CORS_ALLOW_ORIGIN": "*"
 }

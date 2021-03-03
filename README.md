@@ -210,62 +210,62 @@ The fastest and easiest way to test drive RESTPie3 on your machine is to use
 Docker image is created with this [Dockerfile](Dockerfile).
 
 The base image is an [official python image](https://hub.docker.com/_/python)
-variant **python:3.7-slim-buster**, a recent and small Debian as of
-August 2019. The generated image size is 216MB, 76MB gzipped.
+variant **python:3.9-slim-buster**, a recent and small Debian.
 
-If you already have Docker installed, the quick steps to run RESTPie3 plus its
-services Redis, PostgreSQL are:
+If you already have Docker installed, the quick steps to run RESTPie3 with
+SQLite and Redis are:
 
     # download latest redis version 5.x
     docker pull redis:5
 
     # create + start the redis instance
-    docker run -d --name redis -p 63790:6379 redis:5
+    docker run -d --name redis -p 6379:6379 redis:5
 
-    # download latest postgresql version 11.x
-    docker pull postgres:11
+    # download and build RESTPie3
+    git clone https://github.com/tomimick/restpie3
+    cd restpie3
+    ./build.sh
+
+    # start RESTPie3
+    ./run.sh
+
+    # in another term, create initial database schema
+    docker exec -it restpie-dev bash -l -c 'python /app/scripts/dbmigrate.py'
+
+
+If all went OK, RESTPie3 + Redis are running and you should be able to list
+the REST API at http://localhost:8100/api/list
+
+The SQLite database is empty at this point so empty lists are returned from
+the API.  You are also logged out so some of the API end-points can't be
+accessed. To quickly test the API, you can invoke this example script which
+uses curl to do a signup and insert a new movie in the database:
+
+    ./test/quick.sh
+
+For a serious setup you want to have full PostgreSQL. Do the setup like this:
+
+    # download latest postgresql version 12.x
+    docker pull postgres:12
 
     # create + start a postgres instance - use your own db + password!
     # the params here must match the ones in conf/server-config.json
-    docker run -d --name pos-restpie -p 54320:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=MY_PASSWORD postgres:11
+    docker run -d --name pos-restpie -p 5432:5432 -e POSTGRES_DB=tmdb -e POSTGRES_USER=tm -e POSTGRES_PASSWORD=MY_PASSWORD postgres:12
 
     # activate the uuid extension
     docker exec -it pos-restpie psql -U tm -d tmdb -c 'create extension "uuid-ossp"'
 
-    # build the RESTPie3 image
-    git clone https://github.com/tomimick/restpie3
-    cd restpie3
-    docker build -t restpie-image:0.0.1 .
-
-    # create + start RESTPie3
-    docker run --name restpie -d -p 8100:80 restpie-image:0.0.1
-
-    # create initial database schema in postgresql
-    docker exec -it restpie bash -l -c 'python /app/scripts/dbmigrate.py'
-
-
-If all went OK, RESTPie3 + Redis + PostgreSQL are running and you should be
-able to list the REST API at http://localhost:8100/api/list
-
-The database is empty at this point so empty lists are returned from the API.
-You are also logged out so some of the API end-points can't be accessed. To
-quickly test the API, you can invoke this example script which uses curl to do
-a signup and insert a new movie in the database:
-
-    ./test/quick.sh
-
-Note that I am using custom ports for Redis (63790) and PostgreSQL (54320), so
-that they are not mixed with official service ports and so that I can run
-multiple simultaneous instances at different ports, if necessary.
+    # and then in server-config.json
+    # set PYSRV_DATABASE_HOST (see PYSRV_DATABASE_HOST_POSTGRESQL)
 
 To start and stop these docker instances, invoke:
 
     docker start redis
     docker start pos-restpie
-    docker start restpie
+    docker start restpie-dev
     docker stop redis
     docker stop pos-restpie
-    docker stop restpie
+    docker stop restpie-dev
 
 If you don't want to use docker, you can install Redis, PostgreSQL, python3
 and the required python libs on your local machine too. On OSX,
@@ -283,20 +283,7 @@ anything on the local machine and without facing ugly local version conflicts.
 Running the same docker image locally also ensures the environment is
 identical to the release environment, which makes a lot of sense.
 
-Here's how to run the same RESTPie3 image in dev mode:
-
-    # build a dev image
-    docker build --build-arg BUILDMODE=debug-docker -t restpie-dev-image .
-    # or just
-    ./build.sh
-
-    # run the dev image
-    docker run -it --rm --name restpie-dev -p 8100:80 -v `pwd`/py:/app/pylocal restpie-dev-image
-    # or just
     ./run.sh
-
-Then you should see the REST API list again at http://localhost:8100/api/list
-but this time in DEV mode: IS_LOCAL_DEV=True.
 
 The above command runs the dev instance in the foreground so you are able to
 see the logging output in the console and detect errors immediately. You can
@@ -305,7 +292,7 @@ stop the server with CTRL+C.  When the instance ends, its data is deleted (the
 temporary instances.
 
 Now the COOL thing in the dev mode here is that we are using Docker volumes to
-map a local `py` folder containing the python source files to `pylocal` folder
+map a local root folder containing all source files to `/app/` folder
 inside the Docker instance. This makes it possible to use any local file
 editor to edit the python sources and when a file is saved, the server inside
 the Docker instance reloads itself automatically!
@@ -313,7 +300,7 @@ the Docker instance reloads itself automatically!
 To see the executed SQL statements of the server in the console, you can set
 the PYSRV_LOG_SQL env variable:
 
-    docker run --rm --name restpie-dev -p 8100:80 -v `pwd`/py:/app/pylocal -e PYSRV_LOG_SQL=1 restpie-dev-image
+    docker run -it --rm --name restpie-dev -p 8100:80 -v `pwd`/:/app/ -e PYSRV_LOG_SQL=1 restpie-dev-image
 
 
 If you want to run a shell inside the dev instance, invoke in another terminal
