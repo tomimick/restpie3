@@ -1,4 +1,4 @@
-FROM python:3.7-slim-buster
+FROM python:3.9-slim-buster
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ RUN set -ex \
         htop \
     ' \
     && apt-get update && apt-get install -y $buildDeps $deps --no-install-recommends  && rm -rf /var/lib/apt/lists/* \
-    && pip install uWSGI==2.0.18 \
+    && pip install uWSGI==2.0.19.1 \
     && apt-get purge -y --auto-remove $buildDeps \
     && find /usr/local -depth \
     \( \

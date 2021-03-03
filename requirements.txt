@@ -1,10 +1,10 @@
 Flask==1.1.2
 Flask-Session==0.3.2
 passlib==1.7.2
-peewee==3.13.3
+peewee==3.14.1
 peewee-migrate==1.1.6
-psycopg2-binary==2.8.5
-pytz==2020.1
+psycopg2-binary==2.8.6
+pytz==2021.1
 redis==3.5.3
 requests==2.24
 
