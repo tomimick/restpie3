@@ -15,7 +15,7 @@ import cron
 import logging
 log = logging.getLogger("main")
 
-log.info("Running!")
+log.info("Running! http://localhost:8100")
 
 from webutil import app
 if app.testing:
