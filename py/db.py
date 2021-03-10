@@ -136,11 +136,15 @@ def get_user_by_email(email):
     try:
 #         return User.select().where(User.email == email).get()
         # case insensitive query
-        sql = "SELECT * FROM users where LOWER(email) = LOWER(%s) LIMIT 1"
-        args = (email,)
+        if config.IS_SQLITE:
+            sql = "SELECT * FROM users where email = ? LIMIT 1"
+            args = email.lower()
+        else:
+            sql = "SELECT * FROM users where LOWER(email) = LOWER(%s) LIMIT 1"
+            args = (email,)
         return list(User.raw(sql, args))[0]
 
-    except:
+    except IndexError:
         return None
 
 
