@@ -35,7 +35,8 @@ Update Sep 2020: Run in Raspberry with an SQLite database.
 * [What about the front-end?](#what-about-the-front-end)
 * [Need help?](#need-help)
 * [License](#license)
-* [Screenshot](#screenshot)
+* [Screenshot API list](#screenshot)
+* [Screenshot Auth](#screenshot2)
 
 
 Features
@@ -62,6 +63,7 @@ A quick list of the features of this Python API server:
 * Fast rsync deployment of updates to Linux VPS servers
 * Tests for the API
 * Raspberry compatible
+* Simple UI for login/signup/forgot/reset password [Screenshot](#screenshot2)
 
 
 Building blocks
@@ -168,11 +170,13 @@ The whole of this server fits into a small set of files:
 │   ├── /db.py              #   database classes and methods
 │   ├── /main.py            #   server main
 │   ├── /red.py             #   redis: get/set keyvals, lists, atomic
+│   ├── /ui_auth.py         #   quick auth pages
 │   ├── /util.py            #   misc utility functions
 │   └── /webutil.py         #   core web flow: before/after request, auth, role check
 ├── /scripts/               # scripts
 │   └── /dbmigrate.py       #   db migration
 ├── /templates/             # templates (if you really need them)
+│   ├── /auth.html          #   login/signup form
 │   └── /example.html       #   very basic jinja2 example
 ├── /test/                  # test scripts
 │   ├── /quick.sh           #   quick adhoc curl example
@@ -907,35 +911,28 @@ What about the front-end?
 -------------------------
 
 This is primarily a back-end Python server that provides a REST API to the
-world. There is no front-end implementation in this project. This is because
-the focus is on creating a good REST API server that serves web front-ends and
-native mobile apps, but also because I think that it is good to modularize the
-front-end and back-end code cleanly into separate code bases.
+world. There is no front-end implementation in this project apart from the
+four quick auth pages. This is because the focus is on creating a good REST
+API server that serves web front-ends and native mobile apps, but also because
+I think that it is good to modularize the front-end and back-end code cleanly
+into separate code bases.
 
-A web front-end in 2018 can be a big project with gazillion of Javascript
-libraries and tools. It is better to clearly separate the front and back parts
-from each other.  This can also make it easier to divide the work among
-in-house/outsourced teams.
+There is a simple [example.html](templates/example.html) page if you just want
+to quickly output an HTML page that is generated at server side in the old
+fashioned way.
 
-However, nothing stops you from implementing the front-end in this server
-project if you want to have all the code in a single place. And if you only
-need a few server generated HTML pages, you can take a look of included
-[example.html](templates/example.html).
+Also included are simple HTML pages for [login, signup, forgot password and reset password](templates/auth.html) since these pages are usually
+required in every project and it is boring to always build them from
+scratch. Only HTML and CSS is used with zero lines of Javascript.
+It is easy to start the project with them and create something fancier
+later if needed.
 
-If you want inspiration of how to develop a modern web front-end that consumes
-a REST API, take a look of my two open-source starter kits:
+If you want inspiration of larger front-ends, you could take a look of my two
+open-source starter kits although they are getting a bit old already. The tech
+stacks nextjs and nuxtjs are still relevant in 2021 though.
 
 * [React/Nextjs starter](https://github.com/tomimick/tm-nextjs-starter)
 * [Vue/Nuxtjs starter](https://github.com/tomimick/tm-nuxtjs-starter)
-
-React and Vue are currently the most popular Javascript frameworks to create
-front-ends, followed by Angular which is a bit heavier, suited for bigger
-bisness apps.
-
-The two front-end starters and this server handle movie data as an example. You
-can connect the front-ends to this server but first you need to allow
-visitor access for the API methods in `api_movies.py` as the front-ends do not
-implement a login.
 
 
 Need help?
@@ -962,5 +959,13 @@ Screenshot
 [/api/list](http://localhost:8100/api/list) returns an HTML page that lists
 the available API methods and their docstring automatically.
 
-![API-listing](test/api-list.png)
+![API-listing](test/api-list.jpg)
+
+Screenshot2
+-----------
+
+[/auth/signup](http://localhost:8100/auth/signup) quick auth pages for
+login/signup/forgot password/reset password.
+
+![](test/auth.jpg)
 
