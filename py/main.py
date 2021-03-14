@@ -10,6 +10,8 @@ import api_account
 import api_dev
 import api_movies
 
+import ui_auth # quick login/signup pages
+
 import cron
 
 import logging

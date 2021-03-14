@@ -8,6 +8,7 @@
 import pytz
 import datetime
 import time
+import uuid
 import functools
 
 import logging
@@ -42,6 +43,10 @@ def utcnow():
     """Return UTC now."""
     return datetime.datetime.utcnow()
 
+def generate_token():
+    """Generate a random token
+    (an uuid like 8491997531e44d37ac3105b300774e08)"""
+    return uuid.uuid4().hex
 
 def timeit(f):
     """Decorator to measure function execution time."""

@@ -1,0 +1,132 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RESTPie3 Auth</title>
+</head>
+<body>
+
+{# logo image #}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M461.8 53.6c-.4-1.7-1.6-3-3.3-3.4-54.4-13.3-180.1 34.1-248.2 102.2-13.3 13.3-24.2 26.4-33.1 39.1-21-1.9-42-.3-59.9 7.5-50.5 22.2-65.2 80.2-69.3 105.1-1 5.9 3.9 11 9.8 10.4l81.1-8.9c.1 7.8.6 14 1.1 18.3.4 4.2 2.3 8.1 5.3 11.1l31.4 31.4c3 3 6.9 4.9 11.1 5.3 4.3.5 10.5 1 18.2 1.1l-8.9 81c-.6 5.9 4.5 10.8 10.4 9.8 24.9-4 83-18.7 105.1-69.2 7.8-17.9 9.4-38.8 7.6-59.7 12.7-8.9 25.9-19.8 39.2-33.1 68.4-68 115.5-190.9 102.4-248zM298.6 213.5c-16.7-16.7-16.7-43.7 0-60.4 16.7-16.7 43.7-16.7 60.4 0 16.7 16.7 16.7 43.7 0 60.4-16.7 16.7-43.7 16.7-60.4 0z"/><path d="M174.5 380.5c-4.2 4.2-11.7 6.6-19.8 8-18.2 3.1-34.1-12.8-31-31 1.4-8.1 3.7-15.6 7.9-19.7l.1-.1c2.3-2.3.4-6.1-2.8-5.7-9.8 1.2-19.4 5.6-26.9 13.1-18 18-19.7 84.8-19.7 84.8s66.9-1.7 84.9-19.7c7.6-7.6 11.9-17.1 13.1-26.9.3-3.2-3.6-5.1-5.8-2.8z"/></svg>
+
+    {% if err %}
+    <p class="error">{{err}}</p>
+    {% endif %}
+
+    {% if mode == "login" %}
+    <h1>Login</h1>
+    {% elif mode == "signup" %}
+    <h1>Signup</h1>
+    {% elif mode == "forgot" %}
+    <h1>Forgot password</h1>
+    {% elif mode == "reset" %}
+    <h1>Reset password</h1>
+    {% endif %}
+
+    <form method="post" action="/auth/postform">
+        <label>Email</label>
+        <input type="text" name="email" placeholder="Email" required
+            {% if mode == "reset" %}readonly{% endif %}
+            autocomplete="email" value="{{email}}">
+
+        {% if mode == "signup" %}
+        <label>First Name</label>
+        <input type="text" name="firstname" placeholder="First Name" required
+            autocomplete="given-name">
+        <label>Last Name</label>
+        <input type="text" name="lastname" placeholder="Last Name" required
+            autocomplete="family-name">
+        {% endif %}
+
+        {% if mode != "forgot" %}
+        <label>Password</label>
+        <input type="Password" name="passwd" placeholder="Password" required>
+        <label></label>
+        {% endif %}
+        {% if mode == "signup" or mode == "reset" %}
+        <label>Password again</label>
+        <input type="Password" name="passwd2" placeholder="Password" required>
+        {% endif %}
+
+        <p>
+        <input type="hidden" name="mode" value="{{mode}}">
+        {% if token %}
+        <input type="hidden" name="token" value="{{token}}">
+        {% endif %}
+        <input type="submit" class="btn" value="{{mode.capitalize()}}">
+        </p>
+
+    </form>
+
+    <p class="footer">
+    {% if mode != "login" %}<a href="/auth/login">Login</a>{% endif %}
+    {% if mode != "signup" %}<a href="/auth/signup">Signup</a>{% endif %}
+    {% if mode != "forgot" %}<a href="/auth/forgot">Forgot password</a>{% endif %}
+    </p>
+
+    <p class="notice">
+    This is a sample login/signup/forgot/reset page to get you quickly started
+    with the regular auth boilerplate of an app. Just plain HTML and CSS
+    with zero lines of JS.
+    </p>
+
+    <p class=""><a href="/api/list">Back to REST API</a></p>
+
+<style>
+body {
+    width: 40%;
+    margin: 70px auto;
+    text-align: center;
+}
+form {
+    background: #fff0c5;
+    padding: 30px;
+}
+label {
+    display: block;
+    margin-top: 10px;
+}
+input {
+    display: inline-block;
+    width: 60%;
+    border: 1px solid #dda041;
+    padding: 6px;
+}
+input.btn {
+    width: 30%;
+    background: #dda041;
+    color: #fff;
+    padding: 10px;
+    border: 0;
+}
+.notice {
+    color: #888;
+    margin-top: 100px;
+}
+.error {
+    color: red;
+    margin: 30px;
+}
+a {
+    color: #4141df;
+    text-decoration: none;
+    margin: 5px;
+}
+svg {
+    height: 100px;
+    fill: #dda041;
+}
+@media screen and (max-width: 700px) {
+  body {
+    width: 100%;
+    margin: 20px auto;
+  }
+  input {
+    width: 90%;
+  }
+}
+</style>
+
+</body>
+</html>
+
