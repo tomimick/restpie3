@@ -42,14 +42,15 @@ def list_api():
     for rule in rules:
         f = app.view_functions[rule.endpoint]
         docs = f.__doc__ or ''
+        module = f.__module__ + ".py"
 
         # remove noisy OPTIONS
         methods = sorted([x for x in rule.methods if x != "OPTIONS"])
         url = html.escape(str(rule))
-        if not "/api/" in url:
+        if not "/api/" in url and not "/auth/" in url:
             continue
-        apilist.append("<div><a href='{}'><b>{}</b></a> {}<br/>{}</div>".format(
-            url, url, methods, docs))
+        apilist.append("<div><a href='{}'><b>{}</b></a> {}<br/>{} <i>{}</i></div>".format(
+            url, url, methods, docs, module))
 
     header = """<body>
         <title>RESTPie3</title>
@@ -58,6 +59,7 @@ def list_api():
                  font-family: Courier; }
             section { background: #eee; padding: 40px 20px;
                 border: 1px dashed #aaa; }
+            i { color: #888; }
         </style>"""
     title = """
         <section>
