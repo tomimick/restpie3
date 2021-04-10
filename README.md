@@ -877,8 +877,9 @@ Raspberry with pubkey configured.
     sudo apt-get install redis-server
     sudo apt-get install python3-pip
     sudo mkdir /app/
+    sudo chown pi /app
 
-    # in local machine (after ssh with pubkey is setup):
+    # in local machine:
     pico rsync.sh # write your own HOST
     # then transfer files to raspberry /app/
     ./rsync.sh
@@ -888,11 +889,15 @@ Raspberry with pubkey configured.
     sudo pip3 install -r /app/requirements.txt
     sudo pip3 install uwsgi
     cd /app/
+    export PYTHONPATH=/app/py/
     cp conf/server-config.json real-server-config.json
+    export PYSRV_CONFIG_PATH=/app/real-server-config.json
+
     # init sqlite database
+    mkdir data
     python3 scripts/dbmigrate.py
-    # copy /app/data/mydb.sqlite into outside /app for safety (files under /app can be overridden in rsync)
-    pico /app/real-server-config.json # write db location into PYSRV_DATABASE_HOST, change PYSRV_REDIS_HOST to "localhost:6379"
+    # empty database was created at /app/data/mydb.sqlite
+    pico /app/real-server-config.json # make sure all is correct, change PYSRV_REDIS_HOST to "localhost:6379"
 
     # setup server as a service, to start on reboot
     sudo cp conf/pydaemon.service /etc/systemd/system/
