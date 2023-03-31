@@ -5,6 +5,6 @@ peewee==3.14.1
 peewee-migrate==1.1.6
 psycopg2-binary==2.8.6
 pytz==2021.1
-redis==3.5.3
+redis==4.4.4
 requests==2.24
 
