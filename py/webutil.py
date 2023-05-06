@@ -10,7 +10,7 @@ import peewee
 import functools
 from flask import Flask, request, session, g, redirect, abort, jsonify
 from flask_session import Session
-from flask.json import JSONEncoder
+from flask.json.provider import DefaultJSONProvider
 
 import db
 import config
@@ -258,18 +258,22 @@ def _is_role_atleast(myrole, rolebase):
         return False
 
 
-class MyJSONEncoder(JSONEncoder):
+class MyJSONEncoder(DefaultJSONProvider):
     def default(self, obj):
-        if isinstance(obj, peewee.SelectQuery):
+        # print(type(obj))
+
+        if isinstance(obj, peewee.SelectBase):
             return list(obj)
-        if isinstance(obj, db.BaseModel):
+        elif isinstance(obj, db.BaseModel):
             return obj.serialize()
         elif isinstance(obj, datetime.datetime):
-#             dt_local = util.utc2local(obj)
             return obj.isoformat() if obj else None
-        return JSONEncoder.default(self, obj)
+        #elif isinstance(obj, sqlite3.Cursor):
+            #return list(obj)
+        #if isinstance(obj, psycopg2.extensions.cursor):
+            #return list(obj)
+        return DefaultJSONProvider.default(obj)
 
-app.json_encoder = MyJSONEncoder
+app.json = MyJSONEncoder(app)
 
 init_logging()
-

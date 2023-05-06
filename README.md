@@ -11,6 +11,8 @@ Open sourced on Sep 2018 after years of production use at multiple sites.
 
 Update Sep 2020: Run in Raspberry with an SQLite database.
 
+Update May 2023: Python and libraries updated to recent versions. Python 3.11 in use. Still a fine foundation for a new project - the architecture does not age, and simple outlives complex.
+
 **Table of contents**
 
 * [Features](#features)
