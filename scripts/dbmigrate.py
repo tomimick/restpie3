@@ -6,6 +6,7 @@
 #
 # Author: Tomi.Mickelsson@iki.fi
 
+import sys
 import os
 import config
 
@@ -31,3 +32,4 @@ if ret:
 else:
     print("migrate OK")
 
+sys.exit(ret)

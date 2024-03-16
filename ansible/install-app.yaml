@@ -1,0 +1,101 @@
+
+- name: Install our python app server
+  hosts: apphostsroot
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+  - name: Create unix user
+    ansible.builtin.user:
+      name: "{{ app_user }}"
+      groups: "sudo"
+
+  - name: Upload ssh pubkey to authorized key
+    ansible.posix.authorized_key:
+      user: "{{ app_user }}"
+      state: present
+      key: "{{ lookup('file', '~/.ssh/id_myapp.pub') }}"
+
+  - name: Create /app dir
+    ansible.builtin.file:
+      path: /app/
+      state: directory
+      owner: "{{ app_user }}"
+      mode: u=rw,g=r,o=r
+
+  - name: Install packages
+    ansible.builtin.apt:
+      pkg:
+      - python3-pip
+      - python3-venv
+      - uwsgi-core
+      - uwsgi-plugin-python3
+      - htop
+
+  - name: Create python virtual env
+    ansible.builtin.command: "python3 -m venv /app/PYENV/"
+
+  - name: Copy source files to server
+    ansible.posix.synchronize:
+      src: "{{ src_folder }}"
+      dest: /app/
+      owner: false
+      group: false
+      rsync_opts:
+        - "--exclude=.git"
+
+  - name: Create RESTART file
+    ansible.builtin.file:
+      path: /app/RESTART
+      state: touch
+
+  - name: Recursively change ownership of dir
+    ansible.builtin.file:
+      path: /app/
+      state: directory
+      recurse: yes
+      owner: "{{ app_user }}"
+      group: "staff"
+
+  - name: Install py libs
+    ansible.builtin.pip:
+      requirements: /app/requirements.txt
+      virtualenv: /app/PYENV/
+
+  - name: Copy srv config file with correct data
+    ansible.builtin.template:
+      src: "{{ src_folder }}/conf/server-config.json"
+      dest: /app/real-server-config.json
+      owner: "{{ app_user }}"
+      group: root
+      mode: u=rw,g=r,o=r
+
+  - name: Copy service file
+    ansible.builtin.copy:
+      src: "{{ src_folder }}/conf/pydaemon.service"
+      dest: /etc/systemd/system/
+      owner: root
+      group: root
+      mode: u=rwx,g=rx,o=rx
+
+  - name: Enable pydaemon service
+    ansible.builtin.systemd_service:
+      name: pydaemon
+      enabled: true
+      masked: no
+
+  - name: Start pydaemon
+    ansible.builtin.systemd_service:
+      daemon_reload: true
+      state: started
+      name: pydaemon
+
+  - name: Init db schema
+    ansible.builtin.shell:
+      cmd: /app/PYENV/bin/python3 /app/scripts/dbmigrate.py
+      chdir: /app/
+    environment:
+      PYTHONPATH: /app/py/
+      PYSRV_CONFIG_PATH: /app/real-server-config.json
+      PATH: "/app/PYENV/bin/:{{ ansible_env.PATH }}"

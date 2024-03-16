@@ -1,0 +1,43 @@
+
+- name: Install PostgreSQL database server
+  hosts: dbhost
+  become: yes
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Install PostgreSQL server
+      ansible.builtin.apt:
+        name: postgresql
+
+    - name: Install pip
+      ansible.builtin.apt:
+        pkg:
+        - python3-pip
+
+    - name: Install psycopg2 for community plugin below
+      ansible.builtin.pip:
+        name: psycopg2-binary
+        extra_args: --break-system-packages
+
+    - name: Create db user
+      community.postgresql.postgresql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+      become: yes
+      become_user: postgres
+
+    - name: Create app db
+      community.postgresql.postgresql_db:
+        name: "{{ db_name }}"
+        owner: "{{ db_user }}"
+      become: yes
+      become_user: postgres
+
+    - name: Add uuid extension
+      community.postgresql.postgresql_ext:
+        name: uuid-ossp
+        db: "{{ db_name }}"
+      become: yes
+      become_user: postgres

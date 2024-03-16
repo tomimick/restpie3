@@ -1,0 +1,8 @@
+
+- name: Install Redis server
+  hosts: redishost
+
+  tasks:
+  - name: Install Redis
+    ansible.builtin.apt:
+      name: redis

@@ -1,0 +1,33 @@
+
+- name: Deploy software to server
+  hosts: apphosts
+  # note: deploy happens via regular user, not root, which should be disabled
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Synch files to server
+      ansible.posix.synchronize:
+        src: "{{ src_folder }}"
+        dest: /app/
+        rsync_opts:
+          - "--exclude=.git"
+          - "--chown={{ app_user }}:staff"
+
+    - name: DB migration
+      ansible.builtin.shell:
+        cmd: /app/PYENV/bin/python3 /app/scripts/dbmigrate.py
+        chdir: /app/
+      environment:
+        PYTHONPATH: /app/py/
+        PYSRV_CONFIG_PATH: /app/real-server-config.json
+        PATH: "/app/PYENV/bin/:{{ ansible_env.PATH }}"
+      when: 0
+      # when toggles true/false
+
+    - name: Restart server
+      ansible.builtin.file:
+        path: /app/RESTART
+        state: touch
+        mode: u=rw,g=r,o=r

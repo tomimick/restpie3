@@ -16,7 +16,7 @@ User=root
 #Group=mygroup
 # note: create /tmp/pysrv_spooler on reboot
 ExecStartPre=/bin/mkdir -p /tmp/pysrv_spooler;
-ExecStart=/usr/local/bin/uwsgi --ini /app/conf/uwsgi.ini:uwsgi-production
+ExecStart=uwsgi --ini /app/conf/uwsgi.ini:uwsgi-production
 RuntimeDirectory=mydaemon
 Restart=always
 RestartSec=3

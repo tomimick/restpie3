@@ -13,7 +13,7 @@ RUN set -ex \
         htop \
     ' \
     && apt-get update && apt-get install -y $buildDeps $deps --no-install-recommends  && rm -rf /var/lib/apt/lists/* \
-    && pip install uWSGI==2.0.21 \
+    && pip install uWSGI==2.0.24 \
     && apt-get purge -y --auto-remove $buildDeps \
     && find /usr/local -depth \
     \( \
@@ -39,8 +39,8 @@ COPY conf/loginscript.sh /etc/profile
 # background spooler dir
 RUN mkdir /tmp/pysrv_spooler
 
-# we don't need this file with Docker but uwsgi looks for it
-RUN echo `date +%s` >/app/VERSION
+# we don't need this file with Docker (autoload is enabled) but uwsgi looks for it
+RUN echo `date +%s` >/app/RESTART
 
 EXPOSE 80
 
@@ -51,7 +51,7 @@ EXPOSE 80
 # - here I use the sample template from repo
 # - it is also possible to override the config with env variables, either here
 #   or in Amazon ECS or Kubernetes configuration
-COPY conf/server-config.json /app/real-server-config.json
+# COPY conf/server-config-localdev.json /app/real-server-config.json
 # ENV PYSRV_DATABASE_HOST host.docker.internal
 # ENV PYSRV_REDIS_HOST host.docker.internal
 # ENV PYSRV_DATABASE_PASSWORD x

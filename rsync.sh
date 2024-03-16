@@ -10,5 +10,5 @@ sleep 3
 rsync -av --exclude '.git' --exclude '__pycache__' --exclude '*.pyc' --exclude '*.sqlite' * $HOST:/app/
 
 # ask python server to reload sources
-ssh $HOST touch /app/VERSION
+ssh $HOST touch /app/RESTART
 

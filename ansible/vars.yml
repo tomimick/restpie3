@@ -1,0 +1,11 @@
+---
+redis_host: localhost
+db_host: localhost
+src_folder: /Users/x/restpie3/
+app_user: myapp
+db_user: my-db-account
+db_password: my-password-here
+db_name: mydb
+
+# this file has your secrets - keep it safe, do not commit into repository!
+# do not use the default values here!
