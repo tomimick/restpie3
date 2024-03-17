@@ -31,7 +31,6 @@ Update March 2024: Ansible scripts for automatic install to cloud.
 * [Logging](#logging)
 * [Tests](#tests)
 * [Deploy to cloud](#deploy-to-cloud)
-* [Nginx](#nginx)
 * [Security](#security)
 * [Scaling up](#scaling-up)
 * [Run in Raspberry](#run-in-raspberry)
@@ -151,6 +150,7 @@ The whole of this server fits into a small set of files:
 ```
 ├── /ansible/               # ansible files for automated cloud install
 ├── /conf/                  # configuration files
+│   ├── /caddy.conf         #   config for Caddy www proxy that ansible setups
 │   ├── /favicon.ico        #   site icon
 │   ├── /loginscript.sh     #   docker shell login script, sets paths
 │   ├── /pydaemon.service   #   systemd daemon config
@@ -188,6 +188,7 @@ The whole of this server fits into a small set of files:
 │   ├── /test_api.py        #   test API methods
 │   ├── /test_redis.py      #   test redis module
 │   └── /sample.log.txt     #   sample logging output from api test
+├── /www/                   # static files for Caddy
 ├── build.sh                # build Docker image in dev mode
 ├── Dockerfile              # docker image config
 ├── requirements.txt        # python 3rd party dependencies
@@ -639,10 +640,12 @@ There are endless ways to deploy server software to cloud, X amount of tools and
 
 [Ansible](https://www.ansible.com/) is one of the best lightweigt tools to automate infra tasks. It simply runs commands over the SSH against all your servers.
 
-I have prepared 4 Ansible scripts to setup RESTPie3 quickly on a Linux server(s). These steps have been verified to work with Debian 12.5 "bookworm".
+I have prepared Ansible scripts to setup RESTPie3 quickly on a Linux server(s). These steps have been verified to work with Debian 12.5 "bookworm".
+
+The scripts setup Redis + PostgreSQL + RESTPie3 + Caddy on your server(s). [Caddy](https://caddyserver.com) is a solid and simple www server written in Go that can run as a proxy in front of uwsgi.
 
 Prerequisites:
-- Have a root ssh access to your server(s) via ssh publickey, and use ssh-agent to store your private key so you don't have to type it all the time. After setup you should disable server root access.
+- Have a root ssh access to your server(s) via ssh publickey, and use ssh-agent to store your private key so you don't have to type the passphare all the time. After setup you should disable server root access.
 - Update your server to the latest versions: `apt update & apt upgrade`
 - Locally create a new ssh-key for the user-level Linux account that is later used for deploys
   `ssh-keygen -t rsa -f ~/.ssh/id_myapp -C 'restpie3 deploy account'`
@@ -651,14 +654,15 @@ Prerequisites:
 - Put your desired config/secrets into [vars.yml](ansible/vars.yml) Note: do NOT commit secrets into git! Move this file elsewhere or put into `.gitignore`
 - Write the IP-address or domain name of your server into [myhosts.ini](ansible/myhosts.ini). If you have multiple servers, write them all here.
 
-Then run these 3 scripts to setup Redis + PostgreSQL + RESTPie3 on your server(s):
+Then run these scripts:
 
     cd restpie3/ansible/
     ansible-playbook -i myhosts.ini install-redis.yaml
+    ansible-playbook -i myhosts.ini install-caddy.yaml
     ansible-playbook -i myhosts.ini install-db.yaml
     ansible-playbook -i myhosts.ini install-app.yaml
 
-Now you should have a running RESTPie3 at the server you configured. Point your browser there.
+Now you should have a running RESTPie3 at the server you configured. Point your browser there. You should see text `RESTPie3 setup works!`
 
 Your code updates from local machine to server can be deployed with:
 
@@ -666,55 +670,7 @@ Your code updates from local machine to server can be deployed with:
 
 Later you might want to run this script from Github Action to have consistent automation.
 
-Finally do enhance the security of this simple setup:
-- Have a load balancer as a service and then run your servers in a private network. Atleast install a proxy server in front of RESTPie3, like [Nginx](https://www.nginx.com/) or [Caddy](https://caddyserver.com/). Only allow HTTPS traffic.
-- Run uwsgi as a low-privilege user behind the proxy, see [uwsgi.ini](conf/uwsgi.ini)
-- Disable ssh root login after initial setup.
-
-
-Nginx
------
-
-Few words about Nginx: if you want to run this API server and your front-end
-under the same domain, and you are using Nginx, you can have the following
-Nginx config to send all /api/ requests to Python server and other requests to
-other destinations, like to Node and file system:
-
-
-        # in nginx config:
-
-        # to python api server
-        location /api/ {
-            uwsgi_pass localhost:8010;
-            include uwsgi_params;
-            uwsgi_param  X-Real-IP  $remote_addr;
-            uwsgi_param  X-Real-Host $host;
-        }
-
-        # static files
-        location /static/ {
-            root /path/to/myfiles;
-            # note that you must have /path/to/myfiles/static/ folder,
-            # unless rewriting the url
-            try_files $uri /index.html =404;
-        }
-
-        # to Node server
-        location / {
-            proxy_pass http://localhost:8080;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection 'upgrade';
-            proxy_set_header Host $host;
-            proxy_cache_bypass $http_upgrade;
-        }
-
-
-And then enable the uwsgi-listener in [uwsgi.ini](conf/uwsgi.ini):
-
-        # in uwsgi.ini:
-        [uwsgi-production]
-        uwsgi-socket = localhost:8010
+For a production setup you should harden the security of this simple setup with the usual steps like: create a private network behind a load balancer, disable ssh root login, carefully build access control, etc.
 
 
 Security
@@ -738,8 +694,6 @@ A few words about security practices in this software:
 * authorization is enforced via user roles and function decorator, not
   requiring complex code
 * uwsgi supports running code as a lower privileged user
-* uwsgi supports SSL certificates (but a load balancer or nginx in front is
-  recommended as SSL endpoint)
 
 Of course the overall security of the service is also heavily dependent on the
 configuration of the server infrastructure and access policies.

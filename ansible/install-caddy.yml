@@ -1,0 +1,26 @@
+
+- name: Install Caddy www server
+  hosts: wwwhost
+  # assumes you have static files at /app/www/
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+  - name: Install Caddy
+    ansible.builtin.apt:
+      pkg:
+      - caddy
+
+  - name: Copy our caddy config
+    ansible.builtin.copy:
+      src: "{{ src_folder }}/conf/caddy.conf"
+      dest: /etc/caddy/Caddyfile
+      owner: root
+      group: root
+      mode: u=rw,g=r,o=r
+
+  - name: Restart caddy
+    ansible.builtin.systemd_service:
+      state: restarted
+      name: caddy
